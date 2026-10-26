@@ -1,0 +1,156 @@
+/* KawiQuest — generated from tokens.json */
+:root, [data-theme="light"] {
+  --surface-0: #f5f1e8; /* Page background (off-white). Text on it: ink, ink-secondary, ink-muted, link. */
+  --surface-1: #fbf9f4; /* Cards, tables, drawers, the sign-in form card. */
+  --surface-2: #efe9dd; /* Sunken areas: sidebar, sticky table header, segmented-control track, empty bars. */
+  --surface-input: #fffdf9; /* Text inputs, selects and textareas. */
+  --surface-paper: #fbf6ea; /* Writing canvas and submitted-sample viewer (light warm paper). */
+  --surface-dark: #16343a; /* Teal accent: the sign-in illustration panel only. Text on it: on-dark, on-dark-muted. */
+  --line: #e2d8c6; /* Card borders, table row dividers, section dividers (decorative). */
+  --line-strong: #8f7f70; /* Input, select and checkbox borders (3.8:1 on surface-input) so controls stay visible. */
+  --ink: #2a1e16; /* Main text and headings on every off-white surface (13–15:1). */
+  --ink-secondary: #6b5b4d; /* Secondary text, table meta, helper text (5.4–6.2:1). */
+  --ink-muted: #74655a; /* Captions, eyebrows, legends (4.6–5.3:1). */
+  --on-dark: #f5f1e8; /* Text on surface-dark (11.7:1). */
+  --on-dark-muted: #b8c7c3; /* Secondary text on surface-dark (7.6:1). */
+  --copper-on-dark: #e9a066; /* Copper text on surface-dark: the 'Quest' in the logo on the teal bar and sign-in panel (6.1:1). */
+  --copper: #c8763a; /* Brand copper, decorative only: logo, icons, active-nav bar, copper tiles, chart series. Never body text (3:1). */
+  --copper-strong: #a85f2b; /* Primary button fill (white text 4.8:1), focus ring (≥4:1 on every surface). */
+  --copper-hover: #8a4a22; /* Primary button hover (white text 6.8:1). */
+  --link: #9a5626; /* Links and copper-coloured text on off-white (4.6–5.4:1). */
+  --copper-tint: #f6e6d8; /* Selected table row, active nav background, contributor 'what to write' pill. */
+  --glyph: #3b1e0b; /* Dark-brown Kawi glyph on a copper tile (4.4:1). */
+  --on-primary: #ffffff; /* Text on copper-strong / copper-hover buttons. */
+  --ok: #2a7a40; /* Accepted / approved text, on ok-tint (4.6:1) or off-white. Always with a check icon and a word. */
+  --ok-tint: #e5f3e7; /* Ground of approved badges and banners. */
+  --bad: #a8352f; /* Rejected / danger text and danger-button outline (5.3–6.2:1). Always with a cross icon and a word. */
+  --bad-tint: #f8e3e1; /* Ground of rejected badges and banners. */
+  --wait: #8a6410; /* Pending / flagged text on wait-tint (4.7:1). Always with a clock icon and a word. */
+  --wait-tint: #fbf0d4; /* Ground of pending / flagged badges. */
+  --good-bright: #5bc56a; /* Game green: icons, status dots and chart fills only. */
+  --bad-bright: #e5534b; /* Game red: icons, status dots and chart fills only. */
+  --gold: #f2c14e; /* Small highlight only: achievement icons, the current-tier marker, chart fills. */
+  --chart-teal: #16343a; /* Chart series 2 (teal from the game). */
+  --cov-0: #e2d8c6; /* Coverage bar track: no samples. */
+  --cov-1: #e5534b; /* Coverage bar: under 25% of target. */
+  --cov-2: #f2c14e; /* Coverage bar: 25–60% of target. */
+  --cov-3: #9bd8a4; /* Coverage bar: 60–99% of target. */
+  --cov-4: #2a7a40; /* Coverage bar: target reached. */
+  --focus: #a85f2b; /* Focus ring: 2px solid, 2px offset, on every interactive element (≥4:1). */
+  --shadow-1: 0 1px 2px rgba(42,30,22,0.06); /* Cards and tables. */
+  --shadow-2: 0 8px 24px rgba(42,30,22,0.08); /* Edit drawers and the sign-in card. */
+}
+:root {
+  --space-1: 4px; /* Icon-to-label gap, badge padding. */
+  --space-2: 8px; /* Gap between related controls; table cell vertical padding. */
+  --space-3: 12px; /* Button padding, table cell horizontal padding. */
+  --space-4: 16px; /* Grid gutter; card padding on phones. */
+  --space-5: 24px; /* Card padding on desktop; gap between cards. */
+  --space-6: 32px; /* Page side padding. */
+  --space-7: 48px; /* Space between page sections. */
+  --space-8: 64px; /* Sign-in panel padding. */
+  --radius-sm: 6px; /* Badges, inputs, small copper tiles. */
+  --radius-md: 8px; /* Buttons, tabs, the canvas. */
+  --radius-lg: 12px; /* Cards, drawers, large copper tiles. */
+  --radius-pill: 999px; /* Pills, status dots, progress bars. */
+  --font-display: Fredoka, "IBM Plex Sans", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --font-kawi: "Noto Sans Kawi", serif;
+  --text-display-xl: 600 44px/52px var(--font-display); /* Sign-in and sign-up headline (Fredoka SemiBold). */
+  --text-display-lg: 600 30px/38px var(--font-display); /* Page titles (Fredoka SemiBold). */
+  --text-title: 600 18px/26px var(--font-display); /* Section and card titles (Fredoka SemiBold). */
+  --text-heading: 600 15px/22px var(--font-sans); /* Small headings inside cards. */
+  --text-body: 400 15px/22px var(--font-sans); /* Default UI text (IBM Plex Sans). */
+  --text-body-sm: 400 13px/18px var(--font-sans); /* Table cells, helper text, captions. */
+  --text-label: 600 12px/16px var(--font-sans); /* Eyebrows and table headers (uppercase only for table headers). */
+  --text-numeral: 500 28px/34px var(--font-mono); /* Stat figures. */
+  --text-mono: 400 13px/18px var(--font-mono); /* Code points, probabilities, versions, account IDs. */
+  --text-glyph-xl: 400 140px/1 var(--font-kawi); /* Reference glyph on a large copper tile. */
+  --text-glyph-lg: 400 56px/1 var(--font-kawi); /* Glyph cards, drawer previews. */
+  --text-glyph-sm: 400 22px/1 var(--font-kawi); /* Small copper tiles in grids, tables and the queue. */
+}
+.display-xl {
+  font-family: var(--font-display);
+  font-size: 44px;
+  line-height: 52px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.display-lg {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 38px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.heading {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.body-sm {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.numeral {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.glyph-xl {
+  font-family: var(--font-kawi);
+  font-size: 140px;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.glyph-lg {
+  font-family: var(--font-kawi);
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.glyph-sm {
+  font-family: var(--font-kawi);
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+}

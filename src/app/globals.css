@@ -1,0 +1,10 @@
+@import "../styles/tokens.css";
+@import "../styles/kq.css";
+
+/* next/font self-hosts the families under generated names; point the token stacks at them. */
+:root {
+  --font-display: var(--ff-fredoka), var(--ff-plex-sans), system-ui, sans-serif;
+  --font-sans: var(--ff-plex-sans), "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--ff-plex-mono), ui-monospace, Menlo, monospace;
+  --font-kawi: var(--ff-kawi), serif;
+}
