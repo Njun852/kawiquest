@@ -3,7 +3,7 @@
 import { ChartCard, EmptyChart, Legend } from "@/components/charts/ChartCard";
 import { coverageBand, CoverageGrid, HBars, ProgressBars, SERIES, StackedColumns } from "@/components/charts/Charts";
 import { TipRow } from "@/components/charts/useTip";
-import { Card, CardHead, CopperTile, DataTable, PageHead, StatTile } from "@/components/ui";
+import { Card, CardBody, CardHead, CopperTile, DataTable, PageHead, StatTile, StatusBadge } from "@/components/ui";
 import type { Analytics } from "@/lib/analytics/queries";
 
 const nf = new Intl.NumberFormat("en");
@@ -187,6 +187,47 @@ export function AdminDashboard({ data }: { data: Analytics }) {
         </ChartCard>
       </div>
 
+      <div className="kq-grid kq-g-2-1" style={{ alignItems: "start" }}>
+        <Card style={{ overflow: "hidden" }}>
+          <CardHead title="Validator throughput">
+            <span className="kq-muted" style={{ fontSize: 13 }}>
+              Decisions recorded per validator
+            </span>
+          </CardHead>
+          <DataTable
+            caption="Validator throughput"
+            columns={[
+              { key: "who", header: "Validator", render: (v) => <strong>{v.username}</strong> },
+              { key: "reviewed", header: "Reviewed", kind: "num", render: (v) => nf.format(v.reviewed) },
+              { key: "approved", header: "Approve", kind: "num", render: (v) => `${pct(v.approved, v.reviewed)}%` },
+              { key: "rejected", header: "Reject", kind: "num", render: (v) => `${pct(v.rejected, v.reviewed)}%` },
+              { key: "flagged", header: "Flag", kind: "num", render: (v) => `${pct(v.flagged, v.reviewed)}%` },
+            ]}
+            rows={data.throughput}
+            rowKey={(v) => String(v.account_id)}
+            empty="No decisions recorded yet."
+          />
+        </Card>
+        <Card>
+          <CardHead title="Validation status">
+            <span className="kq-mono kq-muted">{nf.format(dataset.samples)}</span>
+          </CardHead>
+          <CardBody className="kq-stack" style={{ gap: 10, fontSize: 14 }}>
+            {(["approved", "pending", "flagged", "rejected"] as const).map((st) => (
+              <div key={st} className="kq-row" style={{ justifyContent: "space-between" }}>
+                <StatusBadge status={st} />
+                <span className="kq-mono">
+                  {nf.format(data.validation[st])} <span className="kq-muted">· {pct(data.validation[st], dataset.samples)}%</span>
+                </span>
+              </div>
+            ))}
+            <p className="kq-muted" style={{ margin: 0, fontSize: 13 }}>
+              Each sample counts once, by its latest decision.
+            </p>
+          </CardBody>
+        </Card>
+      </div>
+
       <Card style={{ overflow: "hidden" }}>
         <CardHead title="Hardest characters">
           <span className="kq-muted" style={{ fontSize: 13 }}>
@@ -208,8 +249,8 @@ export function AdminDashboard({ data }: { data: Analytics }) {
       </Card>
 
       <p className="kq-muted" style={{ margin: 0, fontSize: 13 }}>
-        Not shown: validation results, validator throughput and recognition confidence. The data model doesn&apos;t record
-        them yet.
+        Not shown: recognition confidence, time spent per review, and samples over time. The data model doesn&apos;t
+        record them.
       </p>
     </>
   );

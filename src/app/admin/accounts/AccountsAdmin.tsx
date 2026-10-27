@@ -251,7 +251,7 @@ function AccountDrawer({
   }, {});
   const [confirming, setConfirming] = useState(false);
   const idField = <input type="hidden" name="account_id" value={account.account_id} />;
-  const hasData = account.samples + account.sessions + account.questProgress > 0;
+  const hasData = account.samples + account.sessions + account.questProgress + account.reviews > 0;
 
   return (
     <Drawer title={account.username} onClose={onClose}>
@@ -271,6 +271,7 @@ function AccountDrawer({
         <dt>Data</dt>
         <dd>
           {account.samples} sample(s) · {account.sessions} game session(s)
+          {account.reviews > 0 && <> · {account.reviews} review(s)</>}
         </dd>
       </dl>
 
@@ -311,7 +312,7 @@ function AccountDrawer({
 
       {!isMe && hasData && (
         <p className="kq-muted" style={{ margin: 0, fontSize: 13, borderTop: "1px solid var(--line)", paddingTop: 14 }}>
-          This account can&apos;t be deleted: its samples and game data are research records. Change the role instead.
+          This account can&apos;t be deleted: its samples, game data and reviews are research records. Change the role instead.
         </p>
       )}
       {!isMe && !hasData && (

@@ -2,6 +2,7 @@ import { connection } from "next/server";
 import { getCurrentAccount } from "@/lib/auth/session";
 import { connectDb } from "@/lib/db";
 import { GameLevel, HandwritingSample, KawiCharacter, Quest } from "@/lib/models";
+import { pendingCount } from "@/lib/validation/queries";
 import type { CountKey } from "./nav";
 
 const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
@@ -20,6 +21,9 @@ export async function NavCount({ count }: { count: CountKey }) {
       break;
     case "quests":
       n = await Quest.estimatedDocumentCount();
+      break;
+    case "pending":
+      n = await pendingCount();
       break;
     case "mySubmissions": {
       const me = await getCurrentAccount();

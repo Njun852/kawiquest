@@ -2,7 +2,7 @@ import "server-only";
 import type { Collection } from "mongoose";
 import { roleName, type Role } from "../constants";
 import { connectDb } from "../db";
-import { Account, GameSession, HandwritingSample, PlayerQuestProgress } from "../models";
+import { Account, CharacterValidation, GameSession, HandwritingSample, PlayerQuestProgress } from "../models";
 
 /** One account as the admin panel sees it. Never includes the password hash. */
 export type AccountRow = {
@@ -20,6 +20,8 @@ export type AccountRow = {
   samples: number;
   sessions: number;
   questProgress: number;
+  /** Decisions recorded as a validator. */
+  reviews: number;
 };
 
 const dateFmt = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "Asia/Manila" });
@@ -32,11 +34,12 @@ async function countBy(collection: Collection) {
 
 export async function loadAccounts(): Promise<AccountRow[]> {
   await connectDb();
-  const [accounts, samples, sessions, progress] = await Promise.all([
+  const [accounts, samples, sessions, progress, reviews] = await Promise.all([
     Account.find({}, { _id: 0 }).sort({ registration_date: -1 }).lean(),
     countBy(HandwritingSample.collection),
     countBy(GameSession.collection),
     countBy(PlayerQuestProgress.collection),
+    countBy(CharacterValidation.collection),
   ]);
   return accounts.map((a) => ({
     account_id: a.account_id,
@@ -52,5 +55,6 @@ export async function loadAccounts(): Promise<AccountRow[]> {
     samples: samples.get(a.account_id) ?? 0,
     sessions: sessions.get(a.account_id) ?? 0,
     questProgress: progress.get(a.account_id) ?? 0,
+    reviews: reviews.get(a.account_id) ?? 0,
   }));
 }

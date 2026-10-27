@@ -12,7 +12,14 @@ export {
   type IQuest,
   type IQuestTask,
 } from "./curriculum";
-export { HandwritingSample, type IHandwritingSample } from "./dataset";
+export {
+  HandwritingSample,
+  CharacterValidation,
+  VALIDATION_STATUSES,
+  type IHandwritingSample,
+  type ICharacterValidation,
+  type ValidationStatus,
+} from "./dataset";
 export {
   GameSession,
   PlayerAttempt,
@@ -35,11 +42,11 @@ export {
 import { Counter } from "./_model";
 import { AuthToken, LoginThrottle, Session } from "./auth";
 import { Category, GameLevel, KawiCharacter, Quest, QuestTask } from "./curriculum";
-import { HandwritingSample } from "./dataset";
+import { CharacterValidation, HandwritingSample } from "./dataset";
 import { GameSession, PlayerAttempt, PlayerQuestProgress } from "./game";
 import { Account, PlayerProfile, Role } from "./people";
 
-/** The 12 ERD tables. */
+/** The 12 ERD tables plus character_validations (added 2026-10-26). */
 export const erdModels = [
   Role,
   Account,
@@ -50,6 +57,7 @@ export const erdModels = [
   Quest,
   QuestTask,
   HandwritingSample,
+  CharacterValidation,
   GameSession,
   PlayerAttempt,
   PlayerQuestProgress,

@@ -11,6 +11,7 @@ import { emailConfigured } from "@/lib/mail";
 import {
   Account,
   AuthToken,
+  CharacterValidation,
   GameSession,
   HandwritingSample,
   LoginThrottle,
@@ -128,14 +129,15 @@ export async function deleteAccount(_prev: ActionResult, fd: FormData): Promise<
     if (id === me.id) return { error: "You can't delete your own account." };
     if (roleName(account.role_id) === "admin" && (await adminCount()) <= 1) return { error: "You can't delete the last admin account." };
 
-    const [samples, sessions, progress] = await Promise.all([
+    const [samples, sessions, progress, reviews] = await Promise.all([
       HandwritingSample.countDocuments({ account_id: id }),
       GameSession.countDocuments({ account_id: id }),
       PlayerQuestProgress.countDocuments({ account_id: id }),
+      CharacterValidation.countDocuments({ account_id: id }),
     ]);
-    if (samples || sessions || progress) {
+    if (samples || sessions || progress || reviews) {
       return {
-        error: `Can't delete ${account.username}: ${samples} handwriting sample(s), ${sessions} game session(s) and ${progress} quest progress row(s) belong to it. Change their role or send a reset instead.`,
+        error: `Can't delete ${account.username}: ${samples} handwriting sample(s), ${sessions} game session(s), ${progress} quest progress row(s) and ${reviews} validation decision(s) belong to it. Change their role or send a reset instead.`,
       };
     }
     await Promise.all([

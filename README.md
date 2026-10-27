@@ -44,7 +44,8 @@ npm run seed -- --reset   # put the curriculum back to the seed; accounts, sampl
 Models live in `src/lib/models/` (import from `@/lib/models`); connect with `connectDb()` from `@/lib/db`.
 `GET /api/health` pings the database.
 
-**The schema follows the project ERD exactly** — 12 tables, their columns and nothing else. Each primary key is
+**The schema follows the project ERD exactly** — 12 tables and their columns — plus one approved addition,
+`character_validations` (see Validation). Each primary key is
 the ERD's integer column (`account_id`, `character_id`, …), taken from `counters`; MongoDB's own `_id` stays internal.
 Don't add tables or columns without updating the ERD first.
 
@@ -151,6 +152,21 @@ drawer, as in the design system. Server actions live next to each page (`actions
   and shown but not stored, and strokes and submission time aren't stored either — the ERD has no columns for them.
 - Sample images are served only to their writer, validators and admins. Contributors can remove their own samples.
 
+## Validation
+
+`character_validations` was added to the data model on 2026-10-26 (the one table beyond the ERD): one row per
+validator decision — `validation_id`, `sample_id`, the validator's `account_id`, `status` (`approved` / `rejected` /
+`flagged`), `remarks` (required to reject or flag), `validated_at`. A sample's status is its latest row; no row means
+pending.
+
+- `/validator` — the queue (`src/lib/validation/queries.ts`): category tabs with counts, character filter, and
+  Pending / Flagged / Mine. Oldest sample first (`sample_id` order). The review pane shows the reference glyph beside
+  the 50 × 50 sample and the contributor's account ID only. Keyboard: **A** approve, **R** reject, **F** flag, **S**
+  skip; the next sample opens straight away.
+- `/validator/reviews` — the validator's own decision history; `/validator/glyphs` — every reference form.
+- Contributors see each sample's status; reviewed samples can no longer be removed. Validators with decisions can't
+  be deleted from Accounts. The admin dashboard shows validation status and validator throughput.
+
 ## Modules
 
 1. Foundation / UI kit ✔
@@ -161,9 +177,7 @@ drawer, as in the design system. Server actions live next to each page (`actions
 6. Admin · Accounts ✔
 7. Admin · Analytics ✔
 8. Contributor ✔
-9. Validator
+9. Validator ✔
 10. Player
 11. Game sync API
 12. File storage ✔ (GridFS store and `/files` route, module 5; sample images, module 8)
-#   k a w i q u e s t  
- 

@@ -3,6 +3,7 @@ import { PASSES_PER_WRITER } from "../constants";
 import { formOf } from "../curriculum/forms";
 import { connectDb } from "../db";
 import { Category, HandwritingSample, KawiCharacter } from "../models";
+import { statusCountsFor, statusOf, type SampleStatus } from "../validation/queries";
 
 // Everything the contributor canvas needs, derived from the contributor's own handwriting_samples
 // (the ERD has no pass or timestamp columns: a pass is "every character written once more").
@@ -27,7 +28,9 @@ export type ContributorState = {
   /** Characters still to write in this pass, in inventory order. */
   queue: CanvasTarget[];
   totals: { characters: number; nonCharacters: number };
-  recent: { sample_id: number; image_path: string; label: string; is_non_character: boolean }[];
+  /** Validation status of all this contributor's samples. */
+  statuses: Record<SampleStatus, number>;
+  recent: { sample_id: number; image_path: string; label: string; is_non_character: boolean; status: SampleStatus }[];
 };
 
 export async function loadContributorState(accountId: number): Promise<ContributorState> {
@@ -43,6 +46,7 @@ export async function loadContributorState(accountId: number): Promise<Contribut
     HandwritingSample.find({ account_id: accountId }, { _id: 0 }).sort({ sample_id: -1 }).limit(6).lean(),
   ]);
 
+  const [statuses, recentStatus] = await Promise.all([statusCountsFor(accountId), statusOf(recent.map((s) => s.sample_id))]);
   const count = new Map(counts.map((c) => [c._id, c.n]));
   const categoryName = new Map(categories.map((c) => [c.category_id, c.category_name]));
   const written = (id: number) => count.get(id) ?? 0;
@@ -69,6 +73,7 @@ export async function loadContributorState(accountId: number): Promise<Contribut
     total: characters.length,
     queue,
     totals: { characters: [...count.values()].reduce((a, b) => a + b, 0), nonCharacters },
+    statuses,
     recent: recent.map((s) => {
       const c = s.character_id != null ? byId.get(s.character_id) : undefined;
       return {
@@ -76,6 +81,7 @@ export async function loadContributorState(accountId: number): Promise<Contribut
         image_path: s.image_path,
         label: s.is_non_character ? "Non-character" : c ? `${c.transliteration} · ${c.name}` : "Deleted character",
         is_non_character: s.is_non_character,
+        status: recentStatus.get(s.sample_id) ?? "pending",
       };
     }),
   };

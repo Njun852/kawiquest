@@ -387,3 +387,28 @@ select.kq-input { padding-right: var(--space-6); }
 .kq-samples { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: var(--space-3); }
 .kq-sample { display: flex; flex-direction: column; gap: 6px; padding: var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-1); font-size: 13px; }
 .kq-sample img { width: 100%; aspect-ratio: 1; border-radius: var(--radius-sm); background: #fff; border: 1px solid var(--line); image-rendering: auto; }
+
+/* ===== Validation queue (ValidationQueue) ===== */
+.kq-vq { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: var(--space-4); align-items: start; }
+.kq-vq__list { list-style: none; margin: 0; padding: 0; max-height: 640px; overflow-y: auto; }
+.kq-vq__list li + li { border-top: 1px solid var(--line); }
+.kq-vq__list button { display: flex; width: 100%; gap: 12px; align-items: center; padding: 10px 16px; border: 0; background: none; text-align: left; cursor: pointer; color: var(--ink); }
+.kq-vq__list button:hover { background: var(--surface-2); }
+.kq-vq__list button[aria-current="true"] { background: var(--copper-tint); }
+.kq-vq__who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.kq-vq__who small { font-size: 12px; color: var(--ink-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kq-vq__img { width: 100%; aspect-ratio: 1; object-fit: contain; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface-paper); }
+.kq-vq__sample { background: #fff; image-rendering: pixelated; }
+.kq-vq__tile { width: 100%; font-size: 150px; }
+.kq-vq__tile.kq-tile--multi { font-size: 100px; }
+.kq-vq__none { display: grid; place-items: center; padding: var(--space-5); text-align: center; color: var(--ink-secondary); font-size: 14px; }
+.kq-kbd { font-family: var(--font-mono); font-size: 11px; padding: 1px 5px; border-radius: 3px; border: 1px solid currentColor; opacity: .8; margin-left: 2px; }
+@media (max-width: 1100px) {
+  .kq-vq { grid-template-columns: minmax(0, 1fr); }
+  .kq-vq__list { max-height: 280px; }
+}
+.kq-glyphgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); }
+.kq-glyphgrid .kq-glyph { padding: var(--space-4) var(--space-3); }
+.kq-glyphgrid .kq-mono { text-align: center; overflow-wrap: anywhere; }
+.kq-glyph__img { width: 88px; height: 88px; object-fit: contain; background: var(--surface-paper); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.kq-thumb { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; image-rendering: pixelated; }

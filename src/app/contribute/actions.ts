@@ -1,7 +1,7 @@
 "use server";
 
 import { asRole, num, str, type ActionResult } from "@/lib/server-actions";
-import { HandwritingSample, KawiCharacter, nextId } from "@/lib/models";
+import { CharacterValidation, HandwritingSample, KawiCharacter, nextId } from "@/lib/models";
 import { encodeGrayPng } from "@/lib/png";
 import { deleteFile, putFile } from "@/lib/storage";
 
@@ -45,6 +45,8 @@ export async function deleteOwnSample(_prev: ActionResult, fd: FormData): Promis
     const id = num(fd, "sample_id");
     const sample = id ? await HandwritingSample.findOne({ sample_id: id, account_id: me.id }).lean() : null;
     if (!sample) return { error: "That sample is already gone." };
+    // Once a validator has reviewed a sample it is part of the dataset record.
+    if (await CharacterValidation.exists({ sample_id: id })) return { error: "This sample has been reviewed, so it can't be removed." };
     await HandwritingSample.deleteOne({ sample_id: id });
     await deleteFile(sample.image_path);
     return { success: "Sample removed.", done: "deleted" };

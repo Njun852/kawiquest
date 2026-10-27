@@ -2,7 +2,7 @@ import type { IconName } from "@/components/ui";
 import type { Role } from "@/lib/constants";
 
 /** A count shown at the right of a nav item, loaded separately (see NavCount). */
-export type CountKey = "characters" | "levels" | "quests" | "mySubmissions";
+export type CountKey = "characters" | "levels" | "quests" | "mySubmissions" | "pending";
 
 export type NavItem = { href: string; label: string; icon: IconName; count?: CountKey };
 export type NavSection = { title: string; items: NavItem[] };
@@ -10,7 +10,7 @@ export type NavSection = { title: string; items: NavItem[] };
 const account: NavSection = { title: "Account", items: [{ href: "/account", label: "Account settings", icon: "key" }] };
 
 // The sidebar per role (design system: AdminShell), limited to what the ERD stores:
-// no NPCs or items pages for admins, no "My reviews" for validators.
+// no NPCs or items pages for admins.
 export const NAV: Record<Role, NavSection[]> = {
   admin: [
     { title: "Analytics", items: [{ href: "/admin", label: "Platform analytics", icon: "chart" }] },
@@ -29,7 +29,8 @@ export const NAV: Record<Role, NavSection[]> = {
     {
       title: "Review",
       items: [
-        { href: "/validator", label: "Validation queue", icon: "shield" },
+        { href: "/validator", label: "Validation queue", icon: "shield", count: "pending" },
+        { href: "/validator/reviews", label: "My reviews", icon: "history" },
         { href: "/validator/glyphs", label: "Reference glyphs", icon: "layers" },
       ],
     },

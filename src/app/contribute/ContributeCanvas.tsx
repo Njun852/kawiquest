@@ -2,7 +2,7 @@
 
 import { startTransition, useActionState, useState } from "react";
 import { rasterize, usabilityCheck, WritingCanvas, type Device, type Stroke } from "@/components/canvas/WritingCanvas";
-import { Badge, Banner, Button, Card, CardBody, CardHead, CopperTile, Icon, IconButton, PageHead, ProgressBar, Segmented } from "@/components/ui";
+import { Badge, Banner, Button, Card, CardBody, CardHead, CopperTile, Icon, IconButton, PageHead, ProgressBar, Segmented, StatusBadge } from "@/components/ui";
 import type { ContributorState } from "@/lib/contribute/queries";
 import type { ActionResult } from "@/lib/server-actions";
 import { submitSample } from "./actions";
@@ -188,7 +188,15 @@ export function ContributeCanvas({ state }: { state: ContributorState }) {
                 <span>Non-characters</span>
                 <span className="kq-mono">{state.totals.nonCharacters}</span>
               </div>
-              <div className="kq-row" style={{ justifyContent: "space-between" }}>
+              <div className="kq-stack" style={{ gap: 6, borderTop: "1px solid var(--line)", paddingTop: 10 }}>
+                {(["approved", "pending", "flagged", "rejected"] as const).map((st) => (
+                  <div key={st} className="kq-row" style={{ justifyContent: "space-between" }}>
+                    <StatusBadge status={st} />
+                    <span className="kq-mono">{state.statuses[st]}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="kq-row" style={{ justifyContent: "space-between", borderTop: "1px solid var(--line)", paddingTop: 10 }}>
                 <span>Passes completed</span>
                 <span className="kq-mono">
                   {Math.min(state.pass - 1, state.passesTarget)} / {state.passesTarget}
@@ -207,7 +215,7 @@ export function ContributeCanvas({ state }: { state: ContributorState }) {
                   {/* eslint-disable-next-line @next/next/no-img-element -- served from our own /files route with auth */}
                   <img src={`/files/${s.image_path}`} alt="" width={40} height={40} />
                   <span>{s.label}</span>
-                  <span className="kq-mono kq-muted">#{s.sample_id}</span>
+                  <StatusBadge status={s.status} />
                 </div>
               ))}
             </CardBody>

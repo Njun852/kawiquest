@@ -5,6 +5,7 @@ import { connectDb } from "../db";
 import {
   Account,
   Category,
+  CharacterValidation,
   GameSession,
   HandwritingSample,
   KawiCharacter,
@@ -36,6 +37,8 @@ export type Analytics = {
   weekly: { week: string; label: string; accepted: number; rejected: number }[];
   quests: { quest_id: number; quest_name: string; completed: number; inProgress: number; notStarted: number }[];
   hardest: { character_id: number; form: string; name: string; transliteration: string; attempts: number; accepted: number; rate: number }[];
+  validation: { pending: number; approved: number; rejected: number; flagged: number };
+  throughput: { account_id: number; username: string; reviewed: number; approved: number; rejected: number; flagged: number }[];
 };
 
 const weekLabel = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", timeZone: TZ });
@@ -154,6 +157,39 @@ export async function loadAnalytics(now = new Date()): Promise<Analytics> {
     .sort((a, b) => a.rate - b.rate || b.attempts - a.attempts)
     .slice(0, 8);
 
+  // Validation: each sample's latest decision, and decisions per validator.
+  const [latestRows, perValidator] = await Promise.all([
+    CharacterValidation.aggregate<{ _id: string; n: number }>([
+      { $sort: { validation_id: -1 } },
+      { $group: { _id: "$sample_id", status: { $first: "$status" } } },
+      { $group: { _id: "$status", n: { $sum: 1 } } },
+    ]),
+    CharacterValidation.aggregate<{ _id: number; reviewed: number; approved: number; rejected: number; flagged: number }>([
+      {
+        $group: {
+          _id: "$account_id",
+          reviewed: { $sum: 1 },
+          approved: { $sum: { $cond: [{ $eq: ["$status", "approved"] }, 1, 0] } },
+          rejected: { $sum: { $cond: [{ $eq: ["$status", "rejected"] }, 1, 0] } },
+          flagged: { $sum: { $cond: [{ $eq: ["$status", "flagged"] }, 1, 0] } },
+        },
+      },
+      { $sort: { reviewed: -1 } },
+    ]),
+  ]);
+  const decided = Object.fromEntries(latestRows.map((r) => [r._id, r.n])) as Record<string, number>;
+  const totalSamples = characterSamples + nonCharacter;
+  const validation = {
+    approved: decided.approved ?? 0,
+    rejected: decided.rejected ?? 0,
+    flagged: decided.flagged ?? 0,
+    pending: Math.max(0, totalSamples - latestRows.reduce((a, r) => a + r.n, 0)),
+  };
+  const validatorNames = new Map(
+    (await Account.find({ account_id: { $in: perValidator.map((v) => v._id) } }, { _id: 0, account_id: 1, username: 1 }).lean()).map((a) => [a.account_id, a.username]),
+  );
+  const throughput = perValidator.map((v) => ({ account_id: v._id, username: validatorNames.get(v._id) ?? `#${v._id}`, reviewed: v.reviewed, approved: v.approved, rejected: v.rejected, flagged: v.flagged }));
+
   const s = sessionAgg[0];
   const totalAttempts = attemptsByChar.reduce((a, r) => a + r.attempts, 0);
   return {
@@ -179,6 +215,8 @@ export async function loadAnalytics(now = new Date()): Promise<Analytics> {
     weekly,
     quests: questStats,
     hardest,
+    validation,
+    throughput,
   };
 }
 

@@ -1,4 +1,4 @@
-import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import { useId, type InputHTMLAttributes, type ReactNode, type Ref, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { cx } from "@/lib/cx";
 import { Icon } from "./Icon";
 
@@ -114,7 +114,7 @@ export function TextAreaField({
   className,
   id,
   ...rest
-}: FieldProps & TextareaHTMLAttributes<HTMLTextAreaElement>) {
+}: FieldProps & TextareaHTMLAttributes<HTMLTextAreaElement> & { ref?: Ref<HTMLTextAreaElement> }) {
   const auto = useId();
   const fid = id ?? auto;
   return (

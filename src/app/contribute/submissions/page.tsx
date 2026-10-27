@@ -4,6 +4,7 @@ import { PageHead } from "@/components/ui";
 import { requireAccount } from "@/lib/auth/session";
 import { connectDb } from "@/lib/db";
 import { Category, HandwritingSample, KawiCharacter } from "@/lib/models";
+import { statusOf } from "@/lib/validation/queries";
 import { Submissions, type SubmissionRow } from "./Submissions";
 
 export const metadata: Metadata = { title: "My submissions" };
@@ -30,6 +31,7 @@ async function Content() {
     KawiCharacter.find({}, { _id: 0, character_id: 1, name: 1, transliteration: 1, category_id: 1 }).lean(),
     Category.find({}, { _id: 0 }).lean(),
   ]);
+  const status = await statusOf(samples.map((s) => s.sample_id));
   const byId = new Map(characters.map((c) => [c.character_id, c]));
   const categoryName = new Map(categories.map((c) => [c.category_id, c.category_name]));
   const rows: SubmissionRow[] = samples.map((s) => {
@@ -38,6 +40,7 @@ async function Content() {
       sample_id: s.sample_id,
       image_path: s.image_path,
       is_non_character: s.is_non_character,
+      status: status.get(s.sample_id) ?? "pending",
       label: s.is_non_character ? "Non-character" : c ? `${c.transliteration} · ${c.name}` : "Deleted character",
       category: s.is_non_character ? "Reject class" : c ? categoryName.get(c.category_id) ?? "" : "",
     };
