@@ -22,6 +22,7 @@ import { Account, LoginThrottle } from "@/lib/models";
 
 const NO_MATCH = "That email/username and password don't match.";
 const LOCKED = "Too many tries. Wait a minute, then try again.";
+const DEACTIVATED = "This account has been deactivated. Ask an admin to reactivate it.";
 const MAX_TRIES = 5;
 const LOCK_MS = 60 * 1000;
 
@@ -56,6 +57,8 @@ export async function signIn(_prev: FormState, fd: FormData): Promise<FormState>
   }
 
   await LoginThrottle.deleteOne({ account_id: account.account_id });
+  // Said only after the right password, so it doesn't reveal which accounts exist.
+  if (account.is_active === false) return { error: DEACTIVATED, values };
   await startSession(account, fd.get("keep") === "on");
   redirect(safeNext(text(fd, "next"), roleName(account.role_id)!));
 }
@@ -117,7 +120,7 @@ export async function requestPasswordReset(_prev: FormState, fd: FormData): Prom
 
   await connectDb();
   const account = await Account.findOne(byIdentifier(identifier)).lean();
-  if (account) {
+  if (account && account.is_active !== false) {
     const token = await issueToken(account.account_id, "reset");
     await sendResetEmail(account.email, account.username, token);
   }
@@ -138,7 +141,10 @@ export async function resetPassword(_prev: FormState, fd: FormData): Promise<For
   await connectDb();
   const token = await findValidToken(parsed.data.token);
   if (!token) return { error: LINK_DEAD };
-  const updated = await Account.updateOne({ account_id: token.account_id }, { password_hash: await hashPassword(parsed.data.password) });
+  const updated = await Account.updateOne(
+    { account_id: token.account_id, is_active: { $ne: false } },
+    { password_hash: await hashPassword(parsed.data.password) },
+  );
   if (updated.matchedCount === 0) return { error: LINK_DEAD };
 
   token.used_at = new Date();

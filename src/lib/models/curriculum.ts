@@ -16,7 +16,7 @@ export const Category = defineModel<ICategory>("Category", categorySchema, "cate
 
 export interface IKawiCharacter {
   character_id: number;
-  /** "U+11F12" for one code point; "11F12 11F42 11F31" for a ligature (fits varchar(20)). */
+  /** One code point, "U+11F12". */
   unicode_codepoint: string;
   /** Unicode name in caps without "KAWI (LETTER)": "KA", "VOWEL SIGN I", "KSA". */
   name: string;
@@ -36,7 +36,7 @@ const kawiCharacterSchema = new Schema<IKawiCharacter>(
       required: true,
       unique: true,
       maxlength: 20,
-      match: /^(U\+[0-9A-F]{4,5}|[0-9A-F]{4,5}( [0-9A-F]{4,5})+)$/,
+      match: /^U\+[0-9A-F]{4,5}$/,
     },
     name: { type: String, required: true, trim: true, maxlength: 100 },
     transliteration: { type: String, required: true, trim: true, maxlength: 100 },

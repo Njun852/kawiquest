@@ -38,5 +38,8 @@ export async function deleteFile(path: string) {
   for (const f of await b.find({ filename: path }).toArray()) await b.delete(f._id);
 }
 
+/** A sample's stroke record (JSON) is stored beside its PNG: samples/<account>/<id>.json. */
+export const strokePathOf = (imagePath: string) => imagePath.replace(/\.png$/, ".json");
+
 /** Public URL of a stored file. */
 export const fileUrl = (path: string) => `/files/${path}`;

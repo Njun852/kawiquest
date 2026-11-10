@@ -2,7 +2,7 @@
 
 import { startTransition, useActionState, useState } from "react";
 import { rasterize, usabilityCheck, WritingCanvas, type Device, type Stroke } from "@/components/canvas/WritingCanvas";
-import { Badge, Banner, Button, Card, CardBody, CardHead, CopperTile, Icon, IconButton, PageHead, ProgressBar, Segmented, StatusBadge } from "@/components/ui";
+import { Badge, Banner, Button, Card, CardBody, CardHead, CopperTile, Icon, IconButton, PageHead, ProgressBar, Segmented } from "@/components/ui";
 import type { ContributorState } from "@/lib/contribute/queries";
 import type { ActionResult } from "@/lib/server-actions";
 import { submitSample } from "./actions";
@@ -36,6 +36,8 @@ export function ContributeCanvas({ state }: { state: ContributorState }) {
     fd.set("mode", mode);
     if (!nonCharacter && target) fd.set("character_id", String(target.character_id));
     fd.set("pixels", new Blob([rasterize(strokes) as BlobPart], { type: "application/octet-stream" }));
+    fd.set("strokes", JSON.stringify(strokes));
+    fd.set("device", device ?? "");
     setShowResult(true);
     startTransition(() => submit(fd));
   };
@@ -130,7 +132,11 @@ export function ContributeCanvas({ state }: { state: ContributorState }) {
                   )}
                 </>
               ) : (
-                <p className="kq-muted">No characters in the inventory yet.</p>
+                <p className="kq-muted">
+                  {state.total === 0
+                    ? `None of the ${state.inventory} reference forms has been validated by the Expert Validator yet. You can still draw non-characters.`
+                    : "Nothing left in this pass."}
+                </p>
               )}
             </div>
 
@@ -188,14 +194,6 @@ export function ContributeCanvas({ state }: { state: ContributorState }) {
                 <span>Non-characters</span>
                 <span className="kq-mono">{state.totals.nonCharacters}</span>
               </div>
-              <div className="kq-stack" style={{ gap: 6, borderTop: "1px solid var(--line)", paddingTop: 10 }}>
-                {(["approved", "pending", "flagged", "rejected"] as const).map((st) => (
-                  <div key={st} className="kq-row" style={{ justifyContent: "space-between" }}>
-                    <StatusBadge status={st} />
-                    <span className="kq-mono">{state.statuses[st]}</span>
-                  </div>
-                ))}
-              </div>
               <div className="kq-row" style={{ justifyContent: "space-between", borderTop: "1px solid var(--line)", paddingTop: 10 }}>
                 <span>Passes completed</span>
                 <span className="kq-mono">
@@ -215,7 +213,6 @@ export function ContributeCanvas({ state }: { state: ContributorState }) {
                   {/* eslint-disable-next-line @next/next/no-img-element -- served from our own /files route with auth */}
                   <img src={`/files/${s.image_path}`} alt="" width={40} height={40} />
                   <span>{s.label}</span>
-                  <StatusBadge status={s.status} />
                 </div>
               ))}
             </CardBody>

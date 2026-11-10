@@ -1,0 +1,6 @@
+# Recognition service (manuscript Table 14: FastAPI, Uvicorn, Python 3.12, ONNX Runtime 1.22 CPU).
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+onnxruntime==1.22.0
+numpy==2.2.6
+pillow==11.2.1

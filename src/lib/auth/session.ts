@@ -63,8 +63,8 @@ export const getCurrentAccount = cache(async (): Promise<CurrentAccount | null> 
   const session = await Session.findById(payload.sid).lean();
   if (!session || session.expires_at.getTime() <= Date.now()) return null;
   const account = await Account.findOne({ account_id: session.account_id }).lean();
-  // A deleted account or a role change by an admin ends the session.
-  if (!account || roleName(account.role_id) !== payload.role) return null;
+  // A deleted or deactivated account, or a role change by an admin, ends the session.
+  if (!account || account.is_active === false || roleName(account.role_id) !== payload.role) return null;
   return {
     id: account.account_id,
     sessionId: payload.sid,

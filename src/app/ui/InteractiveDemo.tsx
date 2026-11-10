@@ -22,7 +22,7 @@ import {
 } from "@/components/ui";
 
 // Sample rows from the AdminCharacters preview; module 2 replaces them with kawi_characters.
-type Row = { id: number; form: string; name: string; translit: string; category: string; flag?: "ligature" | "combining" };
+type Row = { id: number; form: string; name: string; translit: string; category: string; flag?: "combining" };
 
 const rows: Row[] = [
   { id: 1, form: "𑼄", name: "A", translit: "a", category: "Vowels" },
@@ -30,11 +30,10 @@ const rows: Row[] = [
   { id: 48, form: "𑽑", name: "DIGIT ONE", translit: "1", category: "Digits" },
   { id: 62, form: "𑼒𑼶", name: "VOWEL SIGN I", translit: "i", category: "Marked forms", flag: "combining" },
   { id: 72, form: "𑼒𑽁", name: "SIGN KILLER", translit: "(killer)", category: "Marked forms", flag: "combining" },
-  { id: 88, form: "𑼒𑽂𑼱", name: "KSA", translit: "ksa", category: "Ligatures", flag: "ligature" },
-  { id: 101, form: "𑽃", name: "DANDA", translit: "(danda)", category: "Punctuation" },
+  { id: 75, form: "𑽃", name: "DANDA", translit: "(danda)", category: "Punctuation" },
 ];
 
-const categories = ["Vowels", "Consonants", "Digits", "Marked forms", "Punctuation", "Ligatures"];
+const categories = ["Vowels", "Consonants", "Digits", "Marked forms", "Punctuation"];
 
 const columns: Column<Row>[] = [
   { key: "form", header: "Form", render: (r) => <CopperTile form={r.form} size="md" /> },
@@ -56,9 +55,7 @@ const columns: Column<Row>[] = [
     key: "flags",
     header: "Flags",
     render: (r) =>
-      r.flag === "ligature" ? (
-        <Badge>Ligature</Badge>
-      ) : r.flag === "combining" ? (
+      r.flag === "combining" ? (
         <Badge tone="wait" icon="clock">
           Combining · on KA
         </Badge>
@@ -185,7 +182,6 @@ export function InteractiveDemo() {
               label="Unicode code points"
               mono
               defaultValue={codePoints(selected.form)}
-              hint={selected.flag === "ligature" ? "Ligatures: consonant + conjoiner + consonant" : undefined}
             />
             <SelectField
               label="Category"
@@ -193,7 +189,6 @@ export function InteractiveDemo() {
               options={categories.map((c) => ({ value: c, label: c }))}
             />
             <div className="kq-row" style={{ gap: 20 }}>
-              <Checkbox label="Is ligature" defaultChecked={selected.flag === "ligature"} />
               <Checkbox label="Is combining mark" defaultChecked={selected.flag === "combining"} />
             </div>
             <TextAreaField label="Remarks" placeholder="Required to reject or flag" error="Add a remark to flag this sample." />

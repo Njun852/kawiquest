@@ -25,6 +25,8 @@ export interface IAccount {
   last_name: string;
   birthday: Date | null;
   registration_date: Date;
+  /** false = deactivated by an admin: can't sign in, data kept. Figure 6 (isActive); added 2026-11-10. */
+  is_active: boolean;
 }
 
 const accountSchema = new Schema<IAccount>(
@@ -38,6 +40,7 @@ const accountSchema = new Schema<IAccount>(
     last_name: { type: String, required: true, trim: true, maxlength: 100 },
     birthday: { type: Date, default: null },
     registration_date: { type: Date, required: true, default: () => new Date() },
+    is_active: { type: Boolean, required: true, default: true },
   },
   erdOptions,
 );

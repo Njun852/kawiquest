@@ -37,33 +37,44 @@ canvas and Fredoka headings are the only links to the game).
 MongoDB through Mongoose. Copy `.env.example` to `.env.local` (defaults to the local MongoDB service), then:
 
 ```bash
-npm run seed              # build indexes, insert any missing curriculum rows (never overwrites admin edits)
-npm run seed -- --reset   # put the curriculum back to the seed; accounts, samples and game data untouched
+npm run seed              # build indexes, insert any missing curriculum rows (never overwrites existing rows)
+npm run seed -- --reset   # put the curriculum back to the seed and remove rows it doesn't have (keeps corrected
+                          # reference images); accounts, samples and game data untouched
 ```
 
 Models live in `src/lib/models/` (import from `@/lib/models`); connect with `connectDb()` from `@/lib/db`.
 `GET /api/health` pings the database.
 
-**The schema follows the project ERD exactly** — 12 tables and their columns — plus one approved addition,
-`character_validations` (see Validation). Each primary key is
+**The schema follows the project ERD** — 12 tables and their columns — plus these approved additions, which the
+ERD (and the manuscript's Figure 6 / data dictionary) must show:
+
+- `character_validations` (2026-10-26) — Expert Validator decisions on reference forms (see Expert validation).
+- `accounts.is_active` (2026-11-10) — false = deactivated: can't sign in, data kept. `npm run seed` marks older
+  accounts active.
+- `game_builds` (2026-11-10) — FR3: `build_id`, `platform` (android), `version` (unique per platform),
+  `model_version`, `notes`, `file_path`, `file_size`, `is_active` (one per platform), `uploaded_at`, `uploaded_by`.
+- `player_achievements` and `player_items` (2026-11-10) — FR7: keyed by (`account_id`, `achievement_key`) and
+  (`account_id`, `item_key`); written by the game through the sync API.
+ Each primary key is
 the ERD's integer column (`account_id`, `character_id`, …), taken from `counters`; MongoDB's own `_id` stays internal.
 Don't add tables or columns without updating the ERD first.
 
 | ERD tables | Notes |
 | --- | --- |
 | `roles`, `accounts`, `player_profiles` | `roles` is seeded with fixed ids (`src/lib/constants.ts`: admin 1, validator 2, contributor 3, player 4). A player gets a `player_profiles` row at sign-up. `account_id` is the anonymous ID shown to validators. |
-| `categories`, `kawi_characters` | `unicode_codepoint` is `U+11F12`, or space-separated hex for a ligature (`11F12 11F42 11F31`, fits varchar(20)). Combining marks have `base_letter = "KA"`; `formOf()` in `src/lib/curriculum/forms.ts` builds the glyph to display. |
-| `game_levels`, `quests`, `quest_tasks` | A character's level is the level of the quest it is a task of. `quests.parent_quest_id` nests a quest under another (null = top level). `quest_tasks` is keyed by (`quest_id`, `character_id`). |
-| `handwriting_samples` | Contributor samples. |
+| `categories`, `kawi_characters` | `unicode_codepoint` is one code point, `U+11F12`. Combining marks have `base_letter = "KA"`; `formOf()` in `src/lib/curriculum/forms.ts` builds the glyph to display. `reference_glyph` holds a corrected image uploaded by the Expert Validator (null = the Noto Sans Kawi form). |
+| `game_levels`, `quests`, `quest_tasks` | Seeded for the game; the web has no pages for them. A character's level is the level of the quest it is a task of. `quests.parent_quest_id` nests a quest under another (null = top level). `quest_tasks` is keyed by (`quest_id`, `character_id`). |
+| `handwriting_samples` | Contributor samples. Each has a 50 × 50 PNG at `image_path` and a stroke record beside it (same path, `.json`). |
 | `game_sessions`, `player_attempts`, `player_quest_progress` | Written by the game (module 11), read by the web. `player_quest_progress` is keyed by (`account_id`, `quest_id`); `status` is 0 not started, 1 in progress, 2 completed (`QUEST_STATUS`). |
 
-Sign-in plumbing lives outside the ERD in `sessions`, `auth_tokens` and `login_throttles`.
+Sign-in plumbing lives outside the ERD in `sessions`, `auth_tokens` and `login_throttles`; unfinished APK uploads
+in `build_uploads`.
 
-The seed holds the full inventory: 87 encoded characters (Unicode Kawi block, as listed in the thesis) + 20
-ligatures = 107, with `character_id` in category order (vowels 1–13, consonants 14–47, digits 48–57, marked forms
-58–74, punctuation 75–87, ligatures 88–107), and 9 levels in play order (House, City Museum, Station, the five
-worlds, Great Hall). **The ligature list is provisional:** only KSA and KTA come from the sources; the other 18 are
-placeholders until the Expert Validator signs off.
+The seed holds the manuscript's inventory: the 87 encoded characters of the Unicode Kawi block (thesis Table 2;
+the CNN adds one reject class), with `character_id` in category order (vowels 1–13, consonants 14–47, digits 48–57,
+marked forms 58–74 including the killer and the conjoiner, punctuation 75–87), and 9 levels in play order (House,
+City Museum, Station, the five worlds, Great Hall). There are no ligatures. A database seeded before this change
+still has the 20 ligature rows and the Ligatures category: `npm run seed -- --reset` removes them.
 
 ## Sign-in and accounts
 
@@ -92,92 +103,107 @@ per role is in `nav.ts`. The nav is static and prerenders; item counts and the s
 the sidebar becomes a top bar with a menu that closes on navigation. Pages not built yet show a placeholder
 (`ComingSoon`), which still checks the role.
 
-## Admin curriculum
+## Admin accounts (FR2)
 
-`/admin/characters`, `/admin/levels` and `/admin/quests` edit the curriculum tables: filter bar → table → 340px
-drawer, as in the design system. Server actions live next to each page (`actions.ts`) and go through `asAdmin()`
-(`src/lib/admin/actions.ts`), which checks the admin session and refreshes the page.
+`/admin/accounts` lists every account with role tabs, a Deactivated tab and search (username, email, name or #id).
 
-- **Characters:** code points can be typed as `U+11F12`, `11F12`, a space-separated sequence, or pasted as Kawi text;
-  they're stored in the ERD format. Marked forms need a base letter; ligatures must be consonant + conjoiner +
-  consonant. "Taught in" comes from the quests the character is a task of. **Import CSV** (columns
-  `unicode_codepoint, name, transliteration, category, base_letter`) updates matching code points and adds the rest,
-  and writes nothing if any row is invalid. Deleting is blocked while samples or player attempts refer to the
-  character; it is removed from every quest's task list.
-- **Reference glyphs** (PNG, JPEG, WebP or SVG, under 512 KB) are stored in MongoDB GridFS (bucket `files`) and served
-  to signed-in people from `/files/<path>` with a sandbox CSP (`src/lib/storage.ts`).
-- **Levels:** area name and play order. Deleting is blocked while quests or game sessions refer to the level.
-- **Quests:** level, `parent_quest_id` (sub-quests are listed under their parent; a quest can't be placed under itself
-  or its own sub-quests) and the ordered task list (`quest_tasks`). Deleting is blocked while it has sub-quests or
-  player progress.
-
-## Admin accounts
-
-`/admin/accounts` lists every account with role tabs and search (username, email, name or #id).
-
-- **New staff account** creates a validator or admin (the only way to make either) with no password and sends a
+- **New account** creates any role (the only way to make validators and admins) with no password and sends a
   7-day set-password invite. Without `RESEND_API_KEY` the panel says the link was printed to the server console.
-- The drawer shows name, email, account ID, birthday and how much data the account owns, and can **change role**
-  (signs them out everywhere; becoming a player adds a `player_profiles` row), **send a password reset** (or resend a
-  pending invite) and **sign out everywhere**.
-- The ERD has no status column, so there is no "deactivate": **delete** is offered only for accounts with no
-  handwriting samples, game sessions or quest progress. Admins can't change their own role or delete themselves, and
-  the last admin can't be removed.
+- The drawer **edits** first and last name, email, username and birthday; **changes the role** (signs them out
+  everywhere; becoming a player adds a `player_profiles` row); **sends a password reset** (or resends a pending
+  invite); **signs them out everywhere**; and **deactivates or reactivates** the account.
+- **Deactivate** keeps the data, ends every session and cancels pending links. A deactivated account is told so at
+  sign-in (only after the right password, so it doesn't reveal which accounts exist), gets no reset emails, and
+  can't use an old reset link.
+- **Delete** is offered only for accounts with no samples, game data or validation decisions. Admins can't
+  deactivate, demote or delete themselves, and the last active admin can't be removed.
 
-## Platform analytics
+For local testing, `npm run test-accounts` creates `admin`, `validator`, `contributor` and `player`, each with the
+username as the password. It refuses to run unless `MONGODB_URI` points at localhost.
 
-`/admin` is the admin dashboard, built only from what the ERD records (`src/lib/analytics/queries.ts`):
+## Game builds (FR3)
 
-- Stat tiles: accounts by role, writers (contributors with samples) against the thesis target of 90, character
-  samples against 107 classes × 180 (90 writers × 2 passes), and game sessions with play time.
-- Class coverage grid (samples per character vs. 180, using the design system's coverage scale plus bar length),
-  samples and in-game accuracy by category, writing attempts per week (last 8 weeks, Manila time), quest progress
-  across players, and the hardest characters (lowest accepted rate, at least 5 attempts).
-- Charts follow the dataviz skill: palettes checked with its validator (accepted `--ok` / not accepted
-  `--copper-on-dark`; completed `--ok` / in progress `--good-bright`), thin marks, every chart with hover and
-  keyboard-focus tooltips and a Table view. Chart parts are in `src/components/charts/`.
-- Not shown, because the ERD doesn't record them: validation results, validator throughput, recognition confidence,
-  and samples over time (`handwriting_samples` has no timestamp).
+`/admin/builds` uploads Android builds and chooses which one players get.
+
+- **Upload:** the APK (up to 400 MB), its version (unique), the model version it expects, and release notes. The
+  browser sends it in 4 MiB pieces (under Vercel's 4.5 MB request limit) to `/api/admin/builds/uploads`; each
+  piece is written straight into GridFS as one chunk, and the file is registered when the last piece is in
+  (`src/lib/builds/upload.ts`). Pieces are retried on network errors; a cancelled or failed upload is cleaned up,
+  and abandoned ones expire after 6 hours. A file that isn't a ZIP (every APK is) is refused at the first piece.
+- **Make active** picks the build players download; the first upload is active automatically. The active build
+  can't be deleted.
+- **Public:** `GET /downloads/kawiquest.apk` streams the active build; `GET /api/builds/latest` returns its version,
+  model version, size and URL for the game's update check. Admins can download any build from the table.
+
+## Admin dashboard
+
+`/admin` is the admin landing page (FR1), plain counts with no charts (`src/lib/accounts/dashboard.ts`): accounts by
+role, reference forms validated out of 87, writers against the thesis target of 90, and character samples against
+87 × 180 (90 writers × 2 passes), plus non-character samples.
 
 ## Contributor canvas
 
 `/contribute` is the writing canvas; `/contribute/submissions` lists the contributor's own samples.
 
-- The target is the next character in this contributor's current **pass** (every character written once more),
-  worked out from their existing `handwriting_samples` — the ERD has no pass column. "Skip for now" moves on within
+- Only characters whose reference form the Expert Validator has validated (approved or corrected) are offered, and the
+  server refuses samples for any other character. Until at least one form is validated, only non-characters can be drawn.
+- The target is the next character in this contributor's current **pass** (every validated character written once
+  more), worked out from their existing `handwriting_samples` — the ERD has no pass column. "Skip for now" moves on within
   the session. Non-character mode saves the reject class (`is_non_character = true`, no `character_id`).
 - The browser sends the drawing as exactly 2,500 grayscale pixels; the server builds the 50 × 50 grayscale PNG
   (`src/lib/png.ts`) and stores it at `samples/<account_id>/<sample_id>.png`, so nothing else can be uploaded.
-- Feedback is usability only (empty, too small, touching the edge). The device (mouse / stylus / finger) is detected
-  and shown but not stored, and strokes and submission time aren't stored either — the ERD has no columns for them.
+- Feedback is usability only (empty, too small, touching the edge). The device (mouse / stylus / finger) is detected,
+  shown, and saved in the stroke record.
 - Sample images are served only to their writer, validators and admins. Contributors can remove their own samples.
+- Each sample is stored as the 50 × 50 PNG **and** a stroke record (manuscript: Dataset Development) at
+  `samples/<account_id>/<sample_id>.json`: format `kawiquest-strokes/1`, the character, `input_method` (mouse,
+  stylus or finger, for per-method results), submission time, and the strokes as point lists in 0–1 coordinates.
+  Removing a sample removes both files.
 
-## Validation
+## Expert validation (FR4)
 
-`character_validations` was added to the data model on 2026-10-26 (the one table beyond the ERD): one row per
-validator decision — `validation_id`, `sample_id`, the validator's `account_id`, `status` (`approved` / `rejected` /
-`flagged`), `remarks` (required to reject or flag), `validated_at`. A sample's status is its latest row; no row means
-pending.
+`character_validations` (the one table beyond the ERD) records the Expert Validator's decisions on reference forms:
+`validation_id`, `character_id`, the validator's `account_id`, `status` (`approved` / `corrected`), `remarks`
+(required for corrected), `validated_at`. A form's status is its latest row; no row means pending. Approved and
+corrected forms both count as validated and are used in data collection.
 
-- `/validator` — the queue (`src/lib/validation/queries.ts`): category tabs with counts, character filter, and
-  Pending / Flagged / Mine. Oldest sample first (`sample_id` order). The review pane shows the reference glyph beside
-  the 50 × 50 sample and the contributor's account ID only. Keyboard: **A** approve, **R** reject, **F** flag, **S**
-  skip; the next sample opens straight away.
-- `/validator/reviews` — the validator's own decision history; `/validator/glyphs` — every reference form.
-- Contributors see each sample's status; reviewed samples can no longer be removed. Validators with decisions can't
-  be deleted from Accounts. The admin dashboard shows validation status and validator throughput.
+- `/validator` — every character's reference form (`src/lib/validation/queries.ts`): category tabs, Pending / Approved /
+  Corrected / All. The review pane shows the form (the uploaded image, or the Noto Sans Kawi form on KA for marks),
+  its name, transliteration and code point, and every earlier decision. **Corrected** needs remarks and can attach a
+  corrected image (PNG, JPEG, WebP or SVG under 512 KB), which replaces the reference form. Keyboard: **A** approve,
+  **C** corrected, **S** skip.
+- `/validator/reviews` — the validator's own decision history.
+- Validators with decisions can't be deleted from Accounts.
+- Handwriting samples are not reviewed in the web app.
+
+## Player dashboard (FR7)
+
+`/player` shows the player's game data, view only (`src/lib/player/queries.ts`): current area, quests completed,
+characters written correctly out of 87, writing accuracy; **assessment results** as one copper tile per character
+(written correctly / practising / not tried) with accuracy per category; quest progress; play sessions; achievements;
+and items. Until the game has synced anything, it says so and links the active build's download.
+
+## Recognition service
+
+`recognition/` is the separate FastAPI service that runs the CNN (POST `/predict`, decision rule, internal token);
+see `recognition/README.md`. `npm run export-labels` writes `recognition/model/labels.json`, the class order training
+and the service must share.
 
 ## Modules
 
+Matched to the manuscript's functional requirements (FR1–FR7), the dataset collection portal and the services.
+
 1. Foundation / UI kit ✔
 2. Data layer ✔
-3. Auth & accounts ✔
+3. Auth & accounts ✔ — FR1, FR5 (one sign-in for every role)
 4. App shell ✔
-5. Admin · Curriculum ✔
-6. Admin · Accounts ✔
-7. Admin · Analytics ✔
-8. Contributor ✔
-9. Validator ✔
-10. Player
-11. Game sync API
-12. File storage ✔ (GridFS store and `/files` route, module 5; sample images, module 8)
+5. Admin · Dashboard ✔ — FR1 landing page
+6. Admin · Accounts ✔ — FR2 (create any role, edit, deactivate)
+7. Admin · Game builds ✔ — FR3
+8. Expert validation ✔ — FR4
+9. Contributor (dataset collection portal) ✔ — PNG + stroke record per sample
+10. Player · Profile ✔ — FR6 (`/account`)
+11. Player · Game data dashboard ✔ — FR7
+12. Game sync API — not built (FR8, FR12: game sign-in, progress, attempts, achievements, items, recognition)
+13. File storage ✔ (GridFS `files` bucket: reference images, sample PNG + JSON, APKs)
+14. Recognition service ✔ — `recognition/` (FastAPI + ONNX Runtime); waits for the trained `model.onnx`

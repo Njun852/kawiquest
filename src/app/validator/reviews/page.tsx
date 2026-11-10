@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Card, CardHead, DataTable, PageHead, StatusBadge } from "@/components/ui";
+import { Card, CardHead, CopperTile, DataTable, PageHead, StatusBadge } from "@/components/ui";
 import { requireAccount } from "@/lib/auth/session";
 import { loadMyReviews, type MyReview } from "@/lib/validation/queries";
 
@@ -31,18 +31,12 @@ async function Content() {
         caption="My reviews"
         rows={rows}
         rowKey={(r) => String(r.validation_id)}
-        empty="No decisions yet. They appear here as you review the queue."
+        empty="No decisions yet. They appear here as you review reference forms."
         columns={[
           {
-            key: "img",
-            header: "Sample",
-            render: (r) =>
-              r.image_path ? (
-                // eslint-disable-next-line @next/next/no-img-element -- served from our own /files route with auth
-                <img src={`/files/${r.image_path}`} alt="" width={44} height={44} className="kq-thumb" />
-              ) : (
-                <span className="kq-muted">—</span>
-              ),
+            key: "form",
+            header: "Form",
+            render: (r) => (r.form ? <CopperTile form={r.form} size="md" /> : <span className="kq-muted">—</span>),
           },
           {
             key: "what",
@@ -51,7 +45,7 @@ async function Content() {
               <>
                 <strong>{r.label}</strong>
                 <div className="kq-mono kq-muted" style={{ fontSize: 11 }}>
-                  sample #{r.sample_id}
+                  #{r.character_id}
                 </div>
               </>
             ),

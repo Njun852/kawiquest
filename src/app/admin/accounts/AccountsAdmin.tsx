@@ -23,15 +23,17 @@ import {
 import type { AccountRow } from "@/lib/accounts/queries";
 import type { ActionResult } from "@/lib/server-actions";
 import type { Role } from "@/lib/constants";
-import { changeRole, createStaff, deleteAccount, sendPasswordLink, signOutEverywhere } from "./actions";
+import { changeRole, createAccountAsAdmin, deleteAccount, sendPasswordLink, setActive, signOutEverywhere, updateDetails } from "./actions";
 
-const TABS: { value: Role | "all"; label: string }[] = [
+const TABS: { value: Role | "all" | "inactive"; label: string }[] = [
   { value: "all", label: "All" },
   { value: "player", label: "Players" },
   { value: "contributor", label: "Contributors" },
   { value: "validator", label: "Validators" },
   { value: "admin", label: "Admins" },
+  { value: "inactive", label: "Deactivated" },
 ];
+const inTab = (a: AccountRow, tab: string) => tab === "all" || (tab === "inactive" ? !a.active : a.role === tab);
 const ROLE_OPTIONS = [
   { value: "player", label: "Player" },
   { value: "contributor", label: "Contributor" },
@@ -50,7 +52,7 @@ export function AccountsAdmin({ accounts, meId }: { accounts: AccountRow[]; meId
   const q = query.trim().toLowerCase();
   const visible = accounts.filter(
     (a) =>
-      (tab === "all" || a.role === tab) &&
+      inTab(a, tab) &&
       (!q || [a.username, a.email, `${a.first_name} ${a.last_name}`, `#${a.account_id}`].some((s) => s.toLowerCase().includes(q))),
   );
 
@@ -78,7 +80,9 @@ export function AccountsAdmin({ accounts, meId }: { accounts: AccountRow[]; meId
       key: "status",
       header: "Status",
       render: (a) =>
-        a.invited ? (
+        !a.active ? (
+          <Badge icon="lock">Deactivated</Badge>
+        ) : a.invited ? (
           <Badge tone="wait" icon="clock">
             Invite pending
           </Badge>
@@ -97,13 +101,13 @@ export function AccountsAdmin({ accounts, meId }: { accounts: AccountRow[]; meId
         title="Accounts"
         actions={
           <Button variant="primary" icon="plus" onClick={() => setCreating((v) => !v)} aria-expanded={creating}>
-            New staff account
+            New account
           </Button>
         }
       />
       {notice && <Banner tone="ok" title={notice} />}
       {creating && (
-        <NewStaffPanel
+        <NewAccountPanel
           onClose={() => setCreating(false)}
           onCreated={(message) => {
             setCreating(false);
@@ -119,7 +123,7 @@ export function AccountsAdmin({ accounts, meId }: { accounts: AccountRow[]; meId
         items={TABS.map((t) => ({
           value: t.value,
           label: t.label,
-          count: t.value === "all" ? accounts.length : accounts.filter((a) => a.role === t.value).length,
+          count: accounts.filter((a) => inTab(a, t.value)).length,
         }))}
       />
       <FilterBar>
@@ -170,9 +174,9 @@ export function AccountsAdmin({ accounts, meId }: { accounts: AccountRow[]; meId
   );
 }
 
-function NewStaffPanel({ onClose, onCreated }: { onClose: () => void; onCreated: (message: string) => void }) {
+function NewAccountPanel({ onClose, onCreated }: { onClose: () => void; onCreated: (message: string) => void }) {
   const [state, action, pending] = useActionState<ActionResult, FormData>(async (prev, fd) => {
-    const r = await createStaff(prev, fd);
+    const r = await createAccountAsAdmin(prev, fd);
     if (r.done === "saved") onCreated(r.success!);
     return r;
   }, {});
@@ -180,7 +184,7 @@ function NewStaffPanel({ onClose, onCreated }: { onClose: () => void; onCreated:
   const v = state.values ?? {};
   return (
     <Card>
-      <CardHead title="New staff account">
+      <CardHead title="New account">
         <Button variant="ghost" size="sm" icon="x" iconOnly onClick={onClose}>
           Close
         </Button>
@@ -188,26 +192,20 @@ function NewStaffPanel({ onClose, onCreated }: { onClose: () => void; onCreated:
       <CardBody>
         <form action={action} className="kq-stack" style={{ gap: 14 }} noValidate>
           <p className="kq-muted" style={{ margin: 0, fontSize: 13 }}>
-            Validators and admins can only be created here. The person gets an email with a link to set their own
-            password; you never see or type it.
+            Any role can be created here; validators and admins only here. The person gets an email with a link to set
+            their own password; you never see or type it.
           </p>
           <div className="kq-grid kq-g2">
             <TextField label="First name" name="first_name" defaultValue={v.first_name} error={err.first_name} />
             <TextField label="Last name" name="last_name" defaultValue={v.last_name} error={err.last_name} />
           </div>
-          <div className="kq-grid kq-g3">
+          <div className="kq-grid kq-g2">
             <TextField label="Email" name="email" type="email" defaultValue={v.email} error={err.email} />
             <TextField label="Username" name="username" defaultValue={v.username} error={err.username} />
-            <SelectField
-              label="Role"
-              name="role"
-              defaultValue={v.role ?? "validator"}
-              error={err.role}
-              options={[
-                { value: "validator", label: "Validator" },
-                { value: "admin", label: "Admin" },
-              ]}
-            />
+          </div>
+          <div className="kq-grid kq-g2">
+            <SelectField label="Role" name="role" defaultValue={v.role ?? "player"} error={err.role} options={ROLE_OPTIONS} />
+            <TextField label="Birthday (optional)" name="birthday" type="date" defaultValue={v.birthday} error={err.birthday} />
           </div>
           {state.error && <Banner tone="bad" title={state.error} />}
           <div className="kq-row" style={{ justifyContent: "flex-end" }}>
@@ -240,6 +238,8 @@ function AccountDrawer({
     setResult(r);
     return r;
   };
+  const [details, detailsAction, saving] = useActionState<ActionResult, FormData>(wrap(updateDetails), {});
+  const [, activeAction, toggling] = useActionState<ActionResult, FormData>(wrap(setActive), {});
   const [, roleAction, changing] = useActionState<ActionResult, FormData>(wrap(changeRole), {});
   const [, linkAction, sending] = useActionState<ActionResult, FormData>(wrap(sendPasswordLink), {});
   const [, outAction, signingOut] = useActionState<ActionResult, FormData>(wrap(signOutEverywhere), {});
@@ -252,20 +252,36 @@ function AccountDrawer({
   const [confirming, setConfirming] = useState(false);
   const idField = <input type="hidden" name="account_id" value={account.account_id} />;
   const hasData = account.samples + account.sessions + account.questProgress + account.reviews > 0;
+  // Field errors and typed values from the details form, kept until the next save.
+  const de = details.fieldErrors ?? {};
+  const dv = details.values ?? {};
 
   return (
     <Drawer title={account.username} onClose={onClose}>
-      <dl className="kq-facts">
-        <dt>Name</dt>
-        <dd>
-          {account.first_name} {account.last_name}
-        </dd>
-        <dt>Email</dt>
-        <dd style={{ overflowWrap: "anywhere" }}>{account.email}</dd>
+      {!account.active && (
+        <Banner tone="wait" title="Deactivated">
+          This account can&apos;t sign in. Its data is kept.
+        </Banner>
+      )}
+      <form action={detailsAction} className="kq-stack" style={{ gap: 10 }} noValidate>
+        {idField}
+        <div className="kq-grid kq-g2" style={{ gap: 10 }}>
+          <TextField label="First name" name="first_name" defaultValue={dv.first_name ?? account.first_name} error={de.first_name} />
+          <TextField label="Last name" name="last_name" defaultValue={dv.last_name ?? account.last_name} error={de.last_name} />
+        </div>
+        <TextField label="Email" name="email" type="email" defaultValue={dv.email ?? account.email} error={de.email} />
+        <div className="kq-grid kq-g2" style={{ gap: 10 }}>
+          <TextField label="Username" name="username" defaultValue={dv.username ?? account.username} error={de.username} />
+          <TextField label="Birthday" name="birthday" type="date" defaultValue={dv.birthday ?? account.birthday ?? ""} error={de.birthday} />
+        </div>
+        <Button type="submit" size="sm" icon="save" pending={saving} style={{ alignSelf: "flex-start" }}>
+          {saving ? "Saving…" : "Save details"}
+        </Button>
+      </form>
+
+      <dl className="kq-facts" style={{ borderTop: "1px solid var(--line)", paddingTop: 14 }}>
         <dt>Account ID</dt>
         <dd className="kq-mono">#{account.account_id}</dd>
-        <dt>Birthday</dt>
-        <dd>{account.birthday ?? <span className="kq-muted">—</span>}</dd>
         <dt>Registered</dt>
         <dd>{account.registered}</dd>
         <dt>Data</dt>
@@ -305,14 +321,23 @@ function AccountDrawer({
             {signingOut ? "Signing out…" : "Sign out everywhere"}
           </Button>
         </form>
+        {!isMe && (
+          <form action={activeAction}>
+            {idField}
+            <input type="hidden" name="active" value={account.active ? "false" : "true"} />
+            <Button type="submit" size="sm" variant={account.active ? "danger" : "secondary"} icon={account.active ? "lock" : "check"} pending={toggling}>
+              {toggling ? "Saving…" : account.active ? "Deactivate account" : "Reactivate account"}
+            </Button>
+          </form>
+        )}
       </div>
 
       {result.error && <Banner tone="bad" title={result.error} />}
-      {result.success && <Banner tone="ok" title={result.success} />}
+      {result.success && !result.fieldErrors && <Banner tone="ok" title={result.success} />}
 
       {!isMe && hasData && (
         <p className="kq-muted" style={{ margin: 0, fontSize: 13, borderTop: "1px solid var(--line)", paddingTop: 14 }}>
-          This account can&apos;t be deleted: its samples, game data and reviews are research records. Change the role instead.
+          This account can&apos;t be deleted: its samples, game data and reviews are research records. Deactivate it instead.
         </p>
       )}
       {!isMe && !hasData && (

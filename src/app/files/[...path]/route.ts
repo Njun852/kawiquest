@@ -13,6 +13,8 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/files/[...path]
   const { path } = await ctx.params;
   if (path.some((p) => p === ".." || p === "")) return new Response("Not found", { status: 404 });
   const key = path.join("/");
+  // Game builds have their own routes (public download of the active build; any build for admins).
+  if (path[0] === "builds") return new Response("Not found", { status: 404 });
 
   // Handwriting samples are research data: only their writer, validators and admins may see them.
   if (path[0] === "samples" && me.role !== "admin" && me.role !== "validator") {

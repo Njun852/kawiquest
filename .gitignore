@@ -42,3 +42,8 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# recognition service
+recognition/.venv/
+recognition/**/__pycache__/
+recognition/.pytest_cache/

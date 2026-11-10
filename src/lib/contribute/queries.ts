@@ -3,10 +3,12 @@ import { PASSES_PER_WRITER } from "../constants";
 import { formOf } from "../curriculum/forms";
 import { connectDb } from "../db";
 import { Category, HandwritingSample, KawiCharacter } from "../models";
-import { statusCountsFor, statusOf, type SampleStatus } from "../validation/queries";
+import { validatedCharacterIds } from "../validation/queries";
 
 // Everything the contributor canvas needs, derived from the contributor's own handwriting_samples
 // (the ERD has no pass or timestamp columns: a pass is "every character written once more").
+// Only characters whose reference form the Expert Validator has validated are offered (manuscript: "Each reference
+// form is approved by the Expert Validator before it is used in data collection").
 
 export type CanvasTarget = {
   character_id: number;
@@ -28,15 +30,16 @@ export type ContributorState = {
   /** Characters still to write in this pass, in inventory order. */
   queue: CanvasTarget[];
   totals: { characters: number; nonCharacters: number };
-  /** Validation status of all this contributor's samples. */
-  statuses: Record<SampleStatus, number>;
-  recent: { sample_id: number; image_path: string; label: string; is_non_character: boolean; status: SampleStatus }[];
+  /** Characters in the inventory, validated or not; `total` counts only the validated ones. */
+  inventory: number;
+  recent: { sample_id: number; image_path: string; label: string; is_non_character: boolean }[];
 };
 
 export async function loadContributorState(accountId: number): Promise<ContributorState> {
   await connectDb();
-  const [characters, categories, counts, nonCharacters, recent] = await Promise.all([
+  const [inventory, validated, categories, counts, nonCharacters, recent] = await Promise.all([
     KawiCharacter.find({}, { _id: 0 }).sort({ character_id: 1 }).lean(),
+    validatedCharacterIds(),
     Category.find({}, { _id: 0 }).lean(),
     HandwritingSample.aggregate<{ _id: number; n: number }>([
       { $match: { account_id: accountId, is_non_character: false } },
@@ -46,13 +49,13 @@ export async function loadContributorState(accountId: number): Promise<Contribut
     HandwritingSample.find({ account_id: accountId }, { _id: 0 }).sort({ sample_id: -1 }).limit(6).lean(),
   ]);
 
-  const [statuses, recentStatus] = await Promise.all([statusCountsFor(accountId), statusOf(recent.map((s) => s.sample_id))]);
+  const characters = inventory.filter((c) => validated.has(c.character_id));
   const count = new Map(counts.map((c) => [c._id, c.n]));
   const categoryName = new Map(categories.map((c) => [c.category_id, c.category_name]));
   const written = (id: number) => count.get(id) ?? 0;
   // The current pass is one more than the fewest times any character has been written.
   const pass = (characters.length ? Math.min(...characters.map((c) => written(c.character_id))) : 0) + 1;
-  const byId = new Map(characters.map((c) => [c.character_id, c]));
+  const byId = new Map(inventory.map((c) => [c.character_id, c]));
 
   const queue = characters
     .filter((c) => written(c.character_id) < pass)
@@ -73,7 +76,7 @@ export async function loadContributorState(accountId: number): Promise<Contribut
     total: characters.length,
     queue,
     totals: { characters: [...count.values()].reduce((a, b) => a + b, 0), nonCharacters },
-    statuses,
+    inventory: inventory.length,
     recent: recent.map((s) => {
       const c = s.character_id != null ? byId.get(s.character_id) : undefined;
       return {
@@ -81,7 +84,6 @@ export async function loadContributorState(accountId: number): Promise<Contribut
         image_path: s.image_path,
         label: s.is_non_character ? "Non-character" : c ? `${c.transliteration} · ${c.name}` : "Deleted character",
         is_non_character: s.is_non_character,
-        status: recentStatus.get(s.sample_id) ?? "pending",
       };
     }),
   };

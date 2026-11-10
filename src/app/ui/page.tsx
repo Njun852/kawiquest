@@ -98,7 +98,6 @@ export default function UiGuide() {
               <RoleBadge role="validator" />
               <RoleBadge role="contributor" />
               <RoleBadge role="player" />
-              <Badge>Ligature</Badge>
               <Badge tone="wait" icon="clock">
                 Combining · on KA
               </Badge>
@@ -111,9 +110,9 @@ export default function UiGuide() {
         <StatTile label="Writers enrolled" value="61" target="90" percent={68} footnote="68% of target" />
         <StatTile
           label="Reference forms"
-          value="101"
-          target="107"
-          percent={94}
+          value="81"
+          target="87"
+          percent={93}
           tone="patina"
           footnote="6 waiting for the validator"
         />
@@ -127,7 +126,7 @@ export default function UiGuide() {
             <GlyphCard form="𑼄" transliteration="a" detail="U+11F04" status={<StatusBadge status="approved" />} />
             <GlyphCard form="𑼒" transliteration="ka" detail="U+11F12" status={<StatusBadge status="approved" />} />
             <GlyphCard form="𑼒𑼶" transliteration="ki" detail="sign I on KA" status={<StatusBadge status="pending">Pending review</StatusBadge>} />
-            <GlyphCard form="𑼒𑽂𑼱" transliteration="ksa" detail="ligature" status={<StatusBadge status="locked">Tier 4</StatusBadge>} />
+            <GlyphCard form="𑽃" transliteration="(danda)" detail="U+11F43" status={<StatusBadge status="locked">Tier 4</StatusBadge>} />
           </div>
           <div className="kq-row" style={{ gap: 8 }}>
             <span className="kq-label" style={{ marginRight: 8 }}>

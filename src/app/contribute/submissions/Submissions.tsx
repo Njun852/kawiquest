@@ -1,12 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Banner, Button, Card, CardBody, CardHead, Segmented, StatusBadge } from "@/components/ui";
+import { Banner, Button, Card, CardBody, CardHead, Segmented } from "@/components/ui";
 import type { ActionResult } from "@/lib/server-actions";
-import type { SampleStatus } from "@/lib/validation/queries";
 import { deleteOwnSample } from "../actions";
 
-export type SubmissionRow = { sample_id: number; image_path: string; label: string; category: string; is_non_character: boolean; status: SampleStatus };
+export type SubmissionRow = { sample_id: number; image_path: string; label: string; category: string; is_non_character: boolean };
 
 export function Submissions({ rows, total, shown }: { rows: SubmissionRow[]; total: number; shown: number }) {
   const [filter, setFilter] = useState("all");
@@ -66,8 +65,7 @@ function SampleCard({ row, onResult }: { row: SubmissionRow; onResult: (r: Actio
       <span className="kq-muted">
         #{row.sample_id} · {row.category}
       </span>
-      <StatusBadge status={row.status} />
-      {row.status !== "pending" ? null : confirming ? (
+      {confirming ? (
         <form action={remove} className="kq-row" style={{ gap: 4 }}>
           <input type="hidden" name="sample_id" value={row.sample_id} />
           <Button type="submit" variant="danger" size="sm" pending={removing}>

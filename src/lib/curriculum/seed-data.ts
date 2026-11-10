@@ -1,9 +1,9 @@
 import { CATEGORIES, CATEGORY_ID, ROLE_IDS, ROLES } from "../constants";
 import type { ICategory, IGameLevel, IKawiCharacter, IQuest, IQuestTask, IRole } from "../models";
-import { CONSONANTS, consonantHex, type ConsonantName } from "./forms";
+import { CONSONANTS, consonantHex } from "./forms";
 
 // Initial rows for the ERD's lookup and curriculum tables. Sources: the Unicode Kawi block as listed in the
-// thesis (Table 2, 87 characters), IAST transliterations as in the Expert Validation Form ("ka", "kā", "kta"),
+// thesis (Table 2, 87 characters), IAST transliterations as in the Expert Validation Form ("ka", "kā"),
 // and the levels and quests from the KawiQuest design system.
 
 export const roles: IRole[] = ROLES.map((r) => ({ role_id: ROLE_IDS[r], role_name: r }));
@@ -35,12 +35,12 @@ export const quests: IQuest[] = [
   { quest_id: 7, level_id: LEVEL.greatHall, parent_quest_id: null, quest_name: "The Great Plate", quest_order: 7 },
 ];
 
-// ---- kawi_characters: 87 encoded characters + 20 ligatures ----
+// ---- kawi_characters: the 87 encoded characters ----
 
 type Row = Omit<IKawiCharacter, "character_id" | "reference_glyph"> & { quest_id: number };
 
-const row = (hex: string | string[], name: string, transliteration: string, category: keyof typeof CATEGORY_ID, quest_id: number, base_letter: string | null = null): Row => ({
-  unicode_codepoint: Array.isArray(hex) ? hex.join(" ") : `U+${hex}`,
+const row = (hex: string, name: string, transliteration: string, category: keyof typeof CATEGORY_ID, quest_id: number, base_letter: string | null = null): Row => ({
+  unicode_codepoint: `U+${hex}`,
   name,
   transliteration,
   category_id: CATEGORY_ID[category],
@@ -81,7 +81,7 @@ const marked = [
   onKa("11F02", "SIGN REPHA", "rka"),
   onKa("11F03", "SIGN VISARGA", "kaḥ"),
   onKa("11F5A", "SIGN NUKTA", "(nukta)"),
-  // Counted in Marked forms but taught in the School quest with the ligatures.
+  // A virama like the killer (thesis Table 2); taught in the School quest.
   onKa("11F42", "CONJOINER", "(conjoiner)", 6),
 ];
 
@@ -95,23 +95,9 @@ const punctuation = (
   ] as const
 ).map(([name, tr], i) => row((0x11f43 + i).toString(16).toUpperCase(), name, tr, "punctuation", 6));
 
-/**
- * The 20 ligatures (consonant + conjoiner + consonant). The thesis leaves the list to the Expert Validator:
- * KSA (design system) and KTA (Expert Validation Form) are named; the other 18 are placeholders.
- */
-const LIGATURES: [ConsonantName, ConsonantName, string][] = [
-  ["KA", "SA", "ksa"], ["KA", "TA", "kta"], ["KA", "RA", "kra"], ["KA", "YA", "kya"], ["KA", "WA", "kwa"],
-  ["TA", "RA", "tra"], ["PA", "RA", "pra"], ["GA", "RA", "gra"], ["DA", "RA", "dra"], ["BA", "RA", "bra"],
-  ["SA", "TA", "sta"], ["NA", "TA", "nta"], ["NA", "DA", "nda"], ["NGA", "KA", "ṅka"], ["NGA", "GA", "ṅga"],
-  ["MA", "PA", "mpa"], ["MA", "BA", "mba"], ["NYA", "CA", "ñca"], ["NYA", "JA", "ñja"], ["SA", "WA", "swa"],
-];
-const ligatures = LIGATURES.map(([a, b, tr]) =>
-  row([consonantHex(a), "11F42", consonantHex(b)], a.slice(0, -1) + b, tr, "ligatures", 6),
-);
-
 // character_id follows the category order: vowels 1–13, consonants 14–47, digits 48–57, marked forms 58–74,
-// punctuation 75–87, ligatures 88–107.
-const all = [...vowels, ...consonants, ...digits, ...marked, ...punctuation, ...ligatures];
+// punctuation 75–87.
+const all = [...vowels, ...consonants, ...digits, ...marked, ...punctuation];
 
 export const kawiCharacters: IKawiCharacter[] = all.map((r, i) => ({
   character_id: i + 1,

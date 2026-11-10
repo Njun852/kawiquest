@@ -1,7 +1,7 @@
 import { connection } from "next/server";
 import { getCurrentAccount } from "@/lib/auth/session";
 import { connectDb } from "@/lib/db";
-import { GameLevel, HandwritingSample, KawiCharacter, Quest } from "@/lib/models";
+import { HandwritingSample } from "@/lib/models";
 import { pendingCount } from "@/lib/validation/queries";
 import type { CountKey } from "./nav";
 
@@ -13,15 +13,6 @@ export async function NavCount({ count }: { count: CountKey }) {
   await connectDb();
   let n: number;
   switch (count) {
-    case "characters":
-      n = await KawiCharacter.estimatedDocumentCount();
-      break;
-    case "levels":
-      n = await GameLevel.estimatedDocumentCount();
-      break;
-    case "quests":
-      n = await Quest.estimatedDocumentCount();
-      break;
     case "pending":
       n = await pendingCount();
       break;

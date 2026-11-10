@@ -28,6 +28,7 @@ export async function createAccount(input: NewAccount): Promise<IAccount> {
     account_id: await nextId("accounts"),
     role_id: ROLE_IDS[role],
     registration_date: new Date(),
+    is_active: true,
     ...rest,
   };
   try {

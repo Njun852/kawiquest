@@ -19,12 +19,12 @@ export function consonantHex(name: ConsonantName) {
 
 const REPHA = 0x11f02; // written before the consonant it sits on
 
-/** "U+11F36" → ["11F36"]; "11F12 11F42 11F31" → ["11F12", "11F42", "11F31"]. */
+/** "U+11F36" → ["11F36"]. */
 export function codePointsOf(unicodeCodepoint: string) {
   return unicodeCodepoint.replace(/^U\+/, "").split(" ");
 }
 
-/** The string to render: dependent signs on their base letter, ligatures as stored. */
+/** The string to render: dependent signs on their base letter, everything else as stored. */
 export function formOf(c: Pick<IKawiCharacter, "unicode_codepoint" | "base_letter">) {
   const own = codePointsOf(c.unicode_codepoint).map((h) => parseInt(h, 16));
   if (!c.base_letter) return String.fromCodePoint(...own);
@@ -32,8 +32,3 @@ export function formOf(c: Pick<IKawiCharacter, "unicode_codepoint" | "base_lette
   return own[0] === REPHA ? String.fromCodePoint(...own, base) : String.fromCodePoint(base, ...own);
 }
 
-/** Store a form's code points the ERD way: "U+XXXXX" for one, space-separated hex for a sequence. */
-export function toUnicodeCodepoint(chars: string) {
-  const hex = [...chars].map((ch) => ch.codePointAt(0)!.toString(16).toUpperCase());
-  return hex.length === 1 ? `U+${hex[0]}` : hex.join(" ");
-}

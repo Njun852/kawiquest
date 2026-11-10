@@ -19,6 +19,7 @@ const statuses = {
   approved: { tone: "ok", icon: "check", word: "Approved" },
   accepted: { tone: "ok", icon: "check", word: "Accepted" },
   completed: { tone: "ok", icon: "check", word: "Completed" },
+  corrected: { tone: "brand", icon: "pen", word: "Corrected" },
   rejected: { tone: "bad", icon: "x", word: "Rejected" },
   pending: { tone: "wait", icon: "clock", word: "Pending" },
   flagged: { tone: "wait", icon: "clock", word: "Flagged" },

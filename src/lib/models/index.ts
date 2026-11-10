@@ -24,10 +24,15 @@ export {
   GameSession,
   PlayerAttempt,
   PlayerQuestProgress,
+  PlayerAchievement,
+  PlayerItem,
   type IGameSession,
   type IPlayerAttempt,
   type IPlayerQuestProgress,
+  type IPlayerAchievement,
+  type IPlayerItem,
 } from "./game";
+export { GameBuild, BuildUpload, BUILD_PLATFORMS, type IGameBuild, type IBuildUpload, type BuildPlatform } from "./builds";
 export {
   Session,
   AuthToken,
@@ -43,10 +48,14 @@ import { Counter } from "./_model";
 import { AuthToken, LoginThrottle, Session } from "./auth";
 import { Category, GameLevel, KawiCharacter, Quest, QuestTask } from "./curriculum";
 import { CharacterValidation, HandwritingSample } from "./dataset";
-import { GameSession, PlayerAttempt, PlayerQuestProgress } from "./game";
+import { BuildUpload, GameBuild } from "./builds";
+import { GameSession, PlayerAchievement, PlayerAttempt, PlayerItem, PlayerQuestProgress } from "./game";
 import { Account, PlayerProfile, Role } from "./people";
 
-/** The 12 ERD tables plus character_validations (added 2026-10-26). */
+/**
+ * The 12 ERD tables plus the approved additions: character_validations (2026-10-26), and game_builds,
+ * player_achievements and player_items (2026-11-10).
+ */
 export const erdModels = [
   Role,
   Account,
@@ -61,6 +70,9 @@ export const erdModels = [
   GameSession,
   PlayerAttempt,
   PlayerQuestProgress,
+  PlayerAchievement,
+  PlayerItem,
+  GameBuild,
 ];
 
-export const allModels = [...erdModels, Counter, Session, AuthToken, LoginThrottle];
+export const allModels = [...erdModels, Counter, Session, AuthToken, LoginThrottle, BuildUpload];

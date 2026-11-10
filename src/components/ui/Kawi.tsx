@@ -26,7 +26,7 @@ export function CopperTile({
   label?: string;
   className?: string;
 }) {
-  // Multi-codepoint forms (sign on KA, ligatures) render a little smaller to fit the tile.
+  // Multi-codepoint forms (a sign on KA) render a little smaller to fit the tile.
   const multi = [...form].length > 1;
   return (
     <span
@@ -50,7 +50,7 @@ export function CopperTile({
 }
 
 /**
- * One Kawi character or ligature: form on a copper tile, transliteration, code point or rule, and state.
+ * One Kawi character: form on a copper tile, transliteration, code point or rule, and state.
  * Dependent signs are passed already on the base letter KA.
  */
 export function GlyphCard({
@@ -61,7 +61,7 @@ export function GlyphCard({
 }: {
   form: string;
   transliteration: string;
-  /** Code point ("U+11F12") or rule ("sign I on KA", "ligature"). */
+  /** Code point ("U+11F12") or rule ("sign I on KA"). */
   detail: string;
   status?: ReactNode;
 }) {
@@ -89,7 +89,7 @@ export function Logo() {
   );
 }
 
-/** Format a form's code points the way the admin panel shows them: "U+11F12" or "11F12 11F42 11F31". */
+/** Format a form's code points: "U+11F12", or space-separated hex for a sign on its base letter. */
 export function codePoints(form: string) {
   const cps = [...form].map((ch) => ch.codePointAt(0)!.toString(16).toUpperCase());
   return cps.length === 1 ? `U+${cps[0]}` : cps.join(" ");

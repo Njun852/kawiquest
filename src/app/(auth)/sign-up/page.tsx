@@ -25,7 +25,7 @@ export default function SignUpPage() {
             recognizer.
           </p>
           <div className="kq-row kq-signup__tiles" style={{ gap: 16, marginTop: 8 }} aria-hidden>
-            {["𑼄", "𑼒", "𑼔", "𑼣", "𑼒𑼶", "𑼒𑽂𑼱"].map((f) => (
+            {["𑼄", "𑼒", "𑼔", "𑼣", "𑼒𑼶", "𑽕"].map((f) => (
               <CopperTile key={f} form={f} size="sm" />
             ))}
           </div>

@@ -71,3 +71,51 @@ export const PlayerQuestProgress = defineModel<IPlayerQuestProgress>(
   questProgressSchema,
   "player_quest_progress",
 );
+
+// player_achievements and player_items — what FR7 shows on the player's dashboard. Written by the game through
+// the sync API, read by the web. Added 2026-11-10 (Figure 6 keeps them in GameData as JSON).
+
+/** PK (account_id, achievement_key). */
+export interface IPlayerAchievement {
+  account_id: number;
+  /** The game's own id for the achievement, e.g. "first-inscription". */
+  achievement_key: string;
+  title: string;
+  description: string | null;
+  earned_at: Date;
+}
+
+const achievementSchema = new Schema<IPlayerAchievement>(
+  {
+    account_id: { type: Number, required: true },
+    achievement_key: { type: String, required: true, trim: true, maxlength: 50 },
+    title: { type: String, required: true, trim: true, maxlength: 100 },
+    description: { type: String, default: null, trim: true, maxlength: 255 },
+    earned_at: { type: Date, required: true, default: () => new Date() },
+  },
+  erdOptions,
+);
+achievementSchema.index({ account_id: 1, achievement_key: 1 }, { unique: true });
+export const PlayerAchievement = defineModel<IPlayerAchievement>("PlayerAchievement", achievementSchema, "player_achievements");
+
+/** PK (account_id, item_key). */
+export interface IPlayerItem {
+  account_id: number;
+  item_key: string;
+  item_name: string;
+  quantity: number;
+  acquired_at: Date;
+}
+
+const itemSchema = new Schema<IPlayerItem>(
+  {
+    account_id: { type: Number, required: true },
+    item_key: { type: String, required: true, trim: true, maxlength: 50 },
+    item_name: { type: String, required: true, trim: true, maxlength: 100 },
+    quantity: { type: Number, required: true, default: 1, min: 0 },
+    acquired_at: { type: Date, required: true, default: () => new Date() },
+  },
+  erdOptions,
+);
+itemSchema.index({ account_id: 1, item_key: 1 }, { unique: true });
+export const PlayerItem = defineModel<IPlayerItem>("PlayerItem", itemSchema, "player_items");

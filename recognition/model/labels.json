@@ -1,0 +1,621 @@
+{
+  "format": "kawiquest-labels/1",
+  "classes": [
+    {
+      "index": 0,
+      "character_id": 1,
+      "name": "A",
+      "transliteration": "a",
+      "unicode_codepoint": "U+11F04"
+    },
+    {
+      "index": 1,
+      "character_id": 2,
+      "name": "AA",
+      "transliteration": "ā",
+      "unicode_codepoint": "U+11F05"
+    },
+    {
+      "index": 2,
+      "character_id": 3,
+      "name": "I",
+      "transliteration": "i",
+      "unicode_codepoint": "U+11F06"
+    },
+    {
+      "index": 3,
+      "character_id": 4,
+      "name": "II",
+      "transliteration": "ī",
+      "unicode_codepoint": "U+11F07"
+    },
+    {
+      "index": 4,
+      "character_id": 5,
+      "name": "U",
+      "transliteration": "u",
+      "unicode_codepoint": "U+11F08"
+    },
+    {
+      "index": 5,
+      "character_id": 6,
+      "name": "UU",
+      "transliteration": "ū",
+      "unicode_codepoint": "U+11F09"
+    },
+    {
+      "index": 6,
+      "character_id": 7,
+      "name": "VOCALIC R",
+      "transliteration": "ṛ",
+      "unicode_codepoint": "U+11F0A"
+    },
+    {
+      "index": 7,
+      "character_id": 8,
+      "name": "VOCALIC RR",
+      "transliteration": "ṝ",
+      "unicode_codepoint": "U+11F0B"
+    },
+    {
+      "index": 8,
+      "character_id": 9,
+      "name": "VOCALIC L",
+      "transliteration": "ḷ",
+      "unicode_codepoint": "U+11F0C"
+    },
+    {
+      "index": 9,
+      "character_id": 10,
+      "name": "VOCALIC LL",
+      "transliteration": "ḹ",
+      "unicode_codepoint": "U+11F0D"
+    },
+    {
+      "index": 10,
+      "character_id": 11,
+      "name": "E",
+      "transliteration": "e",
+      "unicode_codepoint": "U+11F0E"
+    },
+    {
+      "index": 11,
+      "character_id": 12,
+      "name": "AI",
+      "transliteration": "ai",
+      "unicode_codepoint": "U+11F0F"
+    },
+    {
+      "index": 12,
+      "character_id": 13,
+      "name": "O",
+      "transliteration": "o",
+      "unicode_codepoint": "U+11F10"
+    },
+    {
+      "index": 13,
+      "character_id": 14,
+      "name": "KA",
+      "transliteration": "ka",
+      "unicode_codepoint": "U+11F12"
+    },
+    {
+      "index": 14,
+      "character_id": 15,
+      "name": "KHA",
+      "transliteration": "kha",
+      "unicode_codepoint": "U+11F13"
+    },
+    {
+      "index": 15,
+      "character_id": 16,
+      "name": "GA",
+      "transliteration": "ga",
+      "unicode_codepoint": "U+11F14"
+    },
+    {
+      "index": 16,
+      "character_id": 17,
+      "name": "GHA",
+      "transliteration": "gha",
+      "unicode_codepoint": "U+11F15"
+    },
+    {
+      "index": 17,
+      "character_id": 18,
+      "name": "NGA",
+      "transliteration": "ṅa",
+      "unicode_codepoint": "U+11F16"
+    },
+    {
+      "index": 18,
+      "character_id": 19,
+      "name": "CA",
+      "transliteration": "ca",
+      "unicode_codepoint": "U+11F17"
+    },
+    {
+      "index": 19,
+      "character_id": 20,
+      "name": "CHA",
+      "transliteration": "cha",
+      "unicode_codepoint": "U+11F18"
+    },
+    {
+      "index": 20,
+      "character_id": 21,
+      "name": "JA",
+      "transliteration": "ja",
+      "unicode_codepoint": "U+11F19"
+    },
+    {
+      "index": 21,
+      "character_id": 22,
+      "name": "JHA",
+      "transliteration": "jha",
+      "unicode_codepoint": "U+11F1A"
+    },
+    {
+      "index": 22,
+      "character_id": 23,
+      "name": "NYA",
+      "transliteration": "ña",
+      "unicode_codepoint": "U+11F1B"
+    },
+    {
+      "index": 23,
+      "character_id": 24,
+      "name": "TTA",
+      "transliteration": "ṭa",
+      "unicode_codepoint": "U+11F1C"
+    },
+    {
+      "index": 24,
+      "character_id": 25,
+      "name": "TTHA",
+      "transliteration": "ṭha",
+      "unicode_codepoint": "U+11F1D"
+    },
+    {
+      "index": 25,
+      "character_id": 26,
+      "name": "DDA",
+      "transliteration": "ḍa",
+      "unicode_codepoint": "U+11F1E"
+    },
+    {
+      "index": 26,
+      "character_id": 27,
+      "name": "DDHA",
+      "transliteration": "ḍha",
+      "unicode_codepoint": "U+11F1F"
+    },
+    {
+      "index": 27,
+      "character_id": 28,
+      "name": "NNA",
+      "transliteration": "ṇa",
+      "unicode_codepoint": "U+11F20"
+    },
+    {
+      "index": 28,
+      "character_id": 29,
+      "name": "TA",
+      "transliteration": "ta",
+      "unicode_codepoint": "U+11F21"
+    },
+    {
+      "index": 29,
+      "character_id": 30,
+      "name": "THA",
+      "transliteration": "tha",
+      "unicode_codepoint": "U+11F22"
+    },
+    {
+      "index": 30,
+      "character_id": 31,
+      "name": "DA",
+      "transliteration": "da",
+      "unicode_codepoint": "U+11F23"
+    },
+    {
+      "index": 31,
+      "character_id": 32,
+      "name": "DHA",
+      "transliteration": "dha",
+      "unicode_codepoint": "U+11F24"
+    },
+    {
+      "index": 32,
+      "character_id": 33,
+      "name": "NA",
+      "transliteration": "na",
+      "unicode_codepoint": "U+11F25"
+    },
+    {
+      "index": 33,
+      "character_id": 34,
+      "name": "PA",
+      "transliteration": "pa",
+      "unicode_codepoint": "U+11F26"
+    },
+    {
+      "index": 34,
+      "character_id": 35,
+      "name": "PHA",
+      "transliteration": "pha",
+      "unicode_codepoint": "U+11F27"
+    },
+    {
+      "index": 35,
+      "character_id": 36,
+      "name": "BA",
+      "transliteration": "ba",
+      "unicode_codepoint": "U+11F28"
+    },
+    {
+      "index": 36,
+      "character_id": 37,
+      "name": "BHA",
+      "transliteration": "bha",
+      "unicode_codepoint": "U+11F29"
+    },
+    {
+      "index": 37,
+      "character_id": 38,
+      "name": "MA",
+      "transliteration": "ma",
+      "unicode_codepoint": "U+11F2A"
+    },
+    {
+      "index": 38,
+      "character_id": 39,
+      "name": "YA",
+      "transliteration": "ya",
+      "unicode_codepoint": "U+11F2B"
+    },
+    {
+      "index": 39,
+      "character_id": 40,
+      "name": "RA",
+      "transliteration": "ra",
+      "unicode_codepoint": "U+11F2C"
+    },
+    {
+      "index": 40,
+      "character_id": 41,
+      "name": "LA",
+      "transliteration": "la",
+      "unicode_codepoint": "U+11F2D"
+    },
+    {
+      "index": 41,
+      "character_id": 42,
+      "name": "WA",
+      "transliteration": "wa",
+      "unicode_codepoint": "U+11F2E"
+    },
+    {
+      "index": 42,
+      "character_id": 43,
+      "name": "SHA",
+      "transliteration": "śa",
+      "unicode_codepoint": "U+11F2F"
+    },
+    {
+      "index": 43,
+      "character_id": 44,
+      "name": "SSA",
+      "transliteration": "ṣa",
+      "unicode_codepoint": "U+11F30"
+    },
+    {
+      "index": 44,
+      "character_id": 45,
+      "name": "SA",
+      "transliteration": "sa",
+      "unicode_codepoint": "U+11F31"
+    },
+    {
+      "index": 45,
+      "character_id": 46,
+      "name": "HA",
+      "transliteration": "ha",
+      "unicode_codepoint": "U+11F32"
+    },
+    {
+      "index": 46,
+      "character_id": 47,
+      "name": "JNYA",
+      "transliteration": "jña",
+      "unicode_codepoint": "U+11F33"
+    },
+    {
+      "index": 47,
+      "character_id": 48,
+      "name": "DIGIT ZERO",
+      "transliteration": "0",
+      "unicode_codepoint": "U+11F50"
+    },
+    {
+      "index": 48,
+      "character_id": 49,
+      "name": "DIGIT ONE",
+      "transliteration": "1",
+      "unicode_codepoint": "U+11F51"
+    },
+    {
+      "index": 49,
+      "character_id": 50,
+      "name": "DIGIT TWO",
+      "transliteration": "2",
+      "unicode_codepoint": "U+11F52"
+    },
+    {
+      "index": 50,
+      "character_id": 51,
+      "name": "DIGIT THREE",
+      "transliteration": "3",
+      "unicode_codepoint": "U+11F53"
+    },
+    {
+      "index": 51,
+      "character_id": 52,
+      "name": "DIGIT FOUR",
+      "transliteration": "4",
+      "unicode_codepoint": "U+11F54"
+    },
+    {
+      "index": 52,
+      "character_id": 53,
+      "name": "DIGIT FIVE",
+      "transliteration": "5",
+      "unicode_codepoint": "U+11F55"
+    },
+    {
+      "index": 53,
+      "character_id": 54,
+      "name": "DIGIT SIX",
+      "transliteration": "6",
+      "unicode_codepoint": "U+11F56"
+    },
+    {
+      "index": 54,
+      "character_id": 55,
+      "name": "DIGIT SEVEN",
+      "transliteration": "7",
+      "unicode_codepoint": "U+11F57"
+    },
+    {
+      "index": 55,
+      "character_id": 56,
+      "name": "DIGIT EIGHT",
+      "transliteration": "8",
+      "unicode_codepoint": "U+11F58"
+    },
+    {
+      "index": 56,
+      "character_id": 57,
+      "name": "DIGIT NINE",
+      "transliteration": "9",
+      "unicode_codepoint": "U+11F59"
+    },
+    {
+      "index": 57,
+      "character_id": 58,
+      "name": "VOWEL SIGN AA",
+      "transliteration": "kā",
+      "unicode_codepoint": "U+11F34"
+    },
+    {
+      "index": 58,
+      "character_id": 59,
+      "name": "VOWEL SIGN ALTERNATE AA",
+      "transliteration": "kā (alt.)",
+      "unicode_codepoint": "U+11F35"
+    },
+    {
+      "index": 59,
+      "character_id": 60,
+      "name": "VOWEL SIGN I",
+      "transliteration": "ki",
+      "unicode_codepoint": "U+11F36"
+    },
+    {
+      "index": 60,
+      "character_id": 61,
+      "name": "VOWEL SIGN II",
+      "transliteration": "kī",
+      "unicode_codepoint": "U+11F37"
+    },
+    {
+      "index": 61,
+      "character_id": 62,
+      "name": "VOWEL SIGN U",
+      "transliteration": "ku",
+      "unicode_codepoint": "U+11F38"
+    },
+    {
+      "index": 62,
+      "character_id": 63,
+      "name": "VOWEL SIGN UU",
+      "transliteration": "kū",
+      "unicode_codepoint": "U+11F39"
+    },
+    {
+      "index": 63,
+      "character_id": 64,
+      "name": "VOWEL SIGN VOCALIC R",
+      "transliteration": "kṛ",
+      "unicode_codepoint": "U+11F3A"
+    },
+    {
+      "index": 64,
+      "character_id": 65,
+      "name": "VOWEL SIGN E",
+      "transliteration": "ke",
+      "unicode_codepoint": "U+11F3E"
+    },
+    {
+      "index": 65,
+      "character_id": 66,
+      "name": "VOWEL SIGN AI",
+      "transliteration": "kai",
+      "unicode_codepoint": "U+11F3F"
+    },
+    {
+      "index": 66,
+      "character_id": 67,
+      "name": "VOWEL SIGN EU",
+      "transliteration": "kĕ",
+      "unicode_codepoint": "U+11F40"
+    },
+    {
+      "index": 67,
+      "character_id": 68,
+      "name": "SIGN KILLER",
+      "transliteration": "k",
+      "unicode_codepoint": "U+11F41"
+    },
+    {
+      "index": 68,
+      "character_id": 69,
+      "name": "SIGN CANDRABINDU",
+      "transliteration": "kam̐",
+      "unicode_codepoint": "U+11F00"
+    },
+    {
+      "index": 69,
+      "character_id": 70,
+      "name": "SIGN ANUSVARA",
+      "transliteration": "kaṃ",
+      "unicode_codepoint": "U+11F01"
+    },
+    {
+      "index": 70,
+      "character_id": 71,
+      "name": "SIGN REPHA",
+      "transliteration": "rka",
+      "unicode_codepoint": "U+11F02"
+    },
+    {
+      "index": 71,
+      "character_id": 72,
+      "name": "SIGN VISARGA",
+      "transliteration": "kaḥ",
+      "unicode_codepoint": "U+11F03"
+    },
+    {
+      "index": 72,
+      "character_id": 73,
+      "name": "SIGN NUKTA",
+      "transliteration": "(nukta)",
+      "unicode_codepoint": "U+11F5A"
+    },
+    {
+      "index": 73,
+      "character_id": 74,
+      "name": "CONJOINER",
+      "transliteration": "(conjoiner)",
+      "unicode_codepoint": "U+11F42"
+    },
+    {
+      "index": 74,
+      "character_id": 75,
+      "name": "DANDA",
+      "transliteration": "(danda)",
+      "unicode_codepoint": "U+11F43"
+    },
+    {
+      "index": 75,
+      "character_id": 76,
+      "name": "DOUBLE DANDA",
+      "transliteration": "(double danda)",
+      "unicode_codepoint": "U+11F44"
+    },
+    {
+      "index": 76,
+      "character_id": 77,
+      "name": "PUNCTUATION SECTION MARKER",
+      "transliteration": "(section marker)",
+      "unicode_codepoint": "U+11F45"
+    },
+    {
+      "index": 77,
+      "character_id": 78,
+      "name": "PUNCTUATION ALTERNATE SECTION MARKER",
+      "transliteration": "(alt. section marker)",
+      "unicode_codepoint": "U+11F46"
+    },
+    {
+      "index": 78,
+      "character_id": 79,
+      "name": "PUNCTUATION FLOWER",
+      "transliteration": "(flower)",
+      "unicode_codepoint": "U+11F47"
+    },
+    {
+      "index": 79,
+      "character_id": 80,
+      "name": "PUNCTUATION SPACE FILLER",
+      "transliteration": "(space filler)",
+      "unicode_codepoint": "U+11F48"
+    },
+    {
+      "index": 80,
+      "character_id": 81,
+      "name": "PUNCTUATION DOT",
+      "transliteration": "(dot)",
+      "unicode_codepoint": "U+11F49"
+    },
+    {
+      "index": 81,
+      "character_id": 82,
+      "name": "PUNCTUATION DOUBLE DOT",
+      "transliteration": "(double dot)",
+      "unicode_codepoint": "U+11F4A"
+    },
+    {
+      "index": 82,
+      "character_id": 83,
+      "name": "PUNCTUATION TRIPLE DOT",
+      "transliteration": "(triple dot)",
+      "unicode_codepoint": "U+11F4B"
+    },
+    {
+      "index": 83,
+      "character_id": 84,
+      "name": "PUNCTUATION CIRCLE",
+      "transliteration": "(circle)",
+      "unicode_codepoint": "U+11F4C"
+    },
+    {
+      "index": 84,
+      "character_id": 85,
+      "name": "PUNCTUATION FILLED CIRCLE",
+      "transliteration": "(filled circle)",
+      "unicode_codepoint": "U+11F4D"
+    },
+    {
+      "index": 85,
+      "character_id": 86,
+      "name": "PUNCTUATION SPIRAL",
+      "transliteration": "(spiral)",
+      "unicode_codepoint": "U+11F4E"
+    },
+    {
+      "index": 86,
+      "character_id": 87,
+      "name": "PUNCTUATION CLOSING SPIRAL",
+      "transliteration": "(closing spiral)",
+      "unicode_codepoint": "U+11F4F"
+    },
+    {
+      "index": 87,
+      "character_id": null,
+      "name": "REJECT",
+      "transliteration": "(not a character)",
+      "unicode_codepoint": null
+    }
+  ]
+}
